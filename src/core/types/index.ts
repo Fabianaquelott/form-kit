@@ -4,10 +4,11 @@ export interface AdhesionFormData {
   email: string
   phone: string
   termsAccepted: boolean
-  
+  contactId?: string
+
   // Etapa 2: Validação SMS (será expandida)
   smsCode?: string
-  
+
   // Etapa 3: Dados adicionais (será expandida)
   additionalInfo?: Record<string, any>
 }
