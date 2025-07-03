@@ -3,9 +3,9 @@ import { z } from 'zod'
 // Regex para validar nomes, aceitando caracteres comuns em nomes brasileiros e latinos.
 const NAME_REGEX = /^[a-zA-Z\u00C0-\u017F´`~^. ]+$/
 
-// Regex aprimorada para telefones brasileiros (com ou sem DDD, com ou sem hífen).
+// Regex aprimorada para telefones brasileiros, aceitando DDD 00.
 const BRAZILIAN_PHONE_REGEX =
-  /^(?:\(?([1-9][0-9])\)?\s?)?(?:((?:9\d|[2-9])\d{3})-?(\d{4}))$/
+  /^(?:\(?([0-9]{2})\)?\s?)?(?:((?:9\d|[2-9])\d{3})-?(\d{4}))$/
 
 // Schema para Etapa 1: Dados pessoais
 export const personalDataSchema = z.object({
