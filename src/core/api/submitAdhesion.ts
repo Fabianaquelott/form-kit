@@ -1,13 +1,14 @@
 // src/core/api/submitAdhesion.ts
 
-import type { AdhesionFormData, ApiResponse } from '../types'
+import type {
+  AdhesionFormData,
+  ApiResponse,
+  CreateContactPayload,
+} from '../types'
 
-// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.example.com'
-// A URL base agora é relativa, para que o MSW possa interceptá-la.
 const API_BASE_URL = '/api'
-const API_TIMEOUT = 10000 // 10 segundos
+const API_TIMEOUT = 15000
 
-// Função utilitária para requisições HTTP
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -16,11 +17,6 @@ async function apiRequest<T>(
   const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT)
 
   try {
-    // Adicionando um delay simulado para todas as chamadas em dev
-    if (import.meta.env.DEV) {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-    }
-
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       signal: controller.signal,
@@ -31,84 +27,114 @@ async function apiRequest<T>(
     })
 
     clearTimeout(timeoutId)
-
-    const data = await response.json()
+    const responseData = await response.json()
 
     if (!response.ok) {
       return {
         success: false,
-        error: data.message || `HTTP ${response.status}`,
-        data: undefined,
+        error: responseData.message || `HTTP ${response.status}`,
+        ...responseData,
       }
     }
 
     return {
       success: true,
-      data: data.data, // Assumindo que os dados da API estão em um campo "data"
-      message: data.message,
+      ...responseData,
     }
   } catch (error) {
     clearTimeout(timeoutId)
-
-    if (error instanceof Error) {
-      return {
-        success: false,
-        error:
-          error.name === 'AbortError' ? 'Timeout na requisição' : error.message,
-      }
-    }
-
-    return {
-      success: false,
-      error: 'Erro desconhecido na requisição',
-    }
+    const errorMessage =
+      error instanceof Error
+        ? error.name === 'AbortError'
+          ? 'Timeout na requisição'
+          : error.message
+        : 'Erro desconhecido'
+    return { success: false, error: errorMessage }
   }
 }
 
-// Função para criar contato inicial
-export async function createContact(payload: {
-  name: string
-  email: string
-  phone: string
-}): Promise<ApiResponse<{ contactId: string }>> {
-  console.log('🚀 (Mock) Criando contato:', payload)
-  return apiRequest<{ contactId: string }>('/contacts', {
+async function processNewUser(
+  payload: CreateContactPayload
+): Promise<ApiResponse<any>> {
+  // 1. Criar Contato
+  const createContactResponse = await apiRequest('/v2/create-contact', {
     method: 'POST',
     body: JSON.stringify(payload),
   })
+
+  if (!createContactResponse.success || !createContactResponse.contact_id) {
+    if (createContactResponse.code) {
+      return createContactResponse
+    }
+    throw new Error(createContactResponse.error || 'Falha ao criar contato.')
+  }
+
+  const contactId = createContactResponse.contact_id
+
+  // 2. Criar Deal
+  const dealPayload = {
+    contact_id: contactId,
+    deal_name: payload.name,
+    ...payload.urlParams,
+  }
+  const createDealResponse = await apiRequest('/v2/create-deal', {
+    method: 'POST',
+    body: JSON.stringify(dealPayload),
+  })
+
+  if (!createDealResponse.success) {
+    throw new Error(createDealResponse.error || 'Falha ao criar negócio.')
+  }
+
+  // 3. Enviar SMS
+  const smsPayload = {
+    contact_id: contactId,
+    resend: false,
+    phone: `+55${payload.phone.replace(/\D/g, '')}`,
+  }
+  // CORREÇÃO: Alterado de POST para PATCH
+  const sendSmsResponse = await apiRequest('/v2/generate-code-sms', {
+    method: 'PATCH',
+    body: JSON.stringify(smsPayload),
+  })
+
+  if (!sendSmsResponse.success) {
+    throw new Error(sendSmsResponse.error || 'Falha ao enviar SMS.')
+  }
+
+  return { ...createContactResponse, deal: createDealResponse }
 }
 
-// Função para validar código SMS
+export async function handleStep1Submission(
+  payload: CreateContactPayload
+): Promise<ApiResponse<any>> {
+  return processNewUser(payload)
+}
+
 export async function validateSms(payload: {
   contactId: string
   smsCode: string
-}): Promise<ApiResponse<{ isValid: boolean }>> {
-  console.log('📱 (Mock) Validando SMS:', payload)
-  return apiRequest<{ isValid: boolean }>('/sms/validate', {
-    method: 'POST',
-    body: JSON.stringify(payload),
+}): Promise<ApiResponse<any>> {
+  return apiRequest<any>('/v2/validate-code-sms', {
+    method: 'PATCH',
+    body: JSON.stringify({
+      contact_id: payload.contactId,
+      code: payload.smsCode,
+    }),
   })
 }
 
-// Função para finalizar adesão
-export async function submitAdhesion(
-  formData: AdhesionFormData
-): Promise<ApiResponse<{ adhesionId: string; status: string }>> {
-  console.log('✅ (Mock) Finalizando adesão:', formData)
-  // Este endpoint ainda não tem um handler no mock, mas a estrutura está pronta.
-  return apiRequest<{ adhesionId: string; status: string }>('/adhesions', {
-    method: 'POST',
-    body: JSON.stringify(formData),
-  })
-}
-
-// Função para reenviar SMS
-export async function resendSms(
+export async function resendSms(payload: {
   contactId: string
-): Promise<ApiResponse<{ sent: boolean }>> {
-  console.log('🔄 (Mock) Reenviando SMS para:', contactId)
-  // Este endpoint também precisaria de um handler no mock.
-  return apiRequest<{ sent: boolean }>(`/sms/resend/${contactId}`, {
-    method: 'POST',
+  phone: string
+}): Promise<ApiResponse<{ sent: boolean }>> {
+  // CORREÇÃO: Alterado de POST para PATCH
+  return apiRequest<{ sent: boolean }>('/v2/generate-code-sms', {
+    method: 'PATCH',
+    body: JSON.stringify({
+      contact_id: payload.contactId,
+      phone: `+55${payload.phone.replace(/\D/g, '')}`,
+      resend: true,
+    }),
   })
 }

@@ -1,31 +1,26 @@
+// src/core/useAdhesionForm.ts
+
 import { useCallback, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-
 import { useFormStore } from './state/formStore'
 import { useFormNavigation } from './hooks/useFormNavigation'
 import { stepSchemas, type AdhesionFormSchema } from './schemas/adhesionSchema'
-import { createContact, validateSms, submitAdhesion } from './api/submitAdhesion'
-import type { AdhesionFormData } from './types'
+import {
+  handleStep1Submission,
+  validateSms,
+  resendSms,
+} from './api/submitAdhesion'
+import type { AdhesionFormData, CreateContactPayload, UrlParams } from './types'
 
 export interface UseAdhesionFormOptions {
   onStepChange?: (step: number) => void
   onSubmitSuccess?: (data: any) => void
   onSubmitError?: (error: string) => void
-  validateOnBlur?: boolean
-  validateOnChange?: boolean
 }
 
 export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
-  const {
-    onStepChange,
-    onSubmitSuccess,
-    onSubmitError,
-    validateOnBlur = true,
-    validateOnChange = false,
-  } = options
-  
-  // Store state
+  const { onSubmitSuccess, onSubmitError } = options
   const {
     currentStep,
     data: formData,
@@ -37,190 +32,166 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     clearErrors,
     resetForm,
   } = useFormStore()
-  
-  // Navigation
   const navigation = useFormNavigation()
-  
-  // React Hook Form setup
+
   const form = useForm<AdhesionFormSchema>({
     resolver: zodResolver(stepSchemas[currentStep as keyof typeof stepSchemas]),
     defaultValues: formData,
-    mode: validateOnChange ? 'onChange' : validateOnBlur ? 'onBlur' : 'onSubmit',
+    mode: 'onBlur',
   })
-  
-  const { handleSubmit, reset, formState: { errors: formErrors, isValid } } = form
-  
-  // Sync form data with store
+
+  // Efeito para capturar os parâmetros da URL uma única vez
   useEffect(() => {
-    reset(formData)
-  }, [formData, reset])
-  
-  // Notify step changes
-  useEffect(() => {
-    onStepChange?.(currentStep)
-  }, [currentStep, onStepChange])
-  
-  // Handle step navigation with validation
-  const goToNextStep = useCallback(async () => {
-    if (!navigation.canGoNext) return false
-    
-    // Validate current step before proceeding
-    const isStepValid = await form.trigger()
-    if (!isStepValid) return false
-    
-    const currentData = form.getValues()
-    updateFormData(currentData)
-    clearErrors()
-    
-    navigation.nextStep()
-    return true
-  }, [navigation, form, updateFormData, clearErrors])
-  
-  const goToPreviousStep = useCallback(() => {
-    if (!navigation.canGoPrevious) return false
-    
-    const currentData = form.getValues()
-    updateFormData(currentData)
-    
-    navigation.previousStep()
-    return true
-  }, [navigation, form, updateFormData])
-  
-  const goToStep = useCallback((step: number) => {
-    const currentData = form.getValues()
-    updateFormData(currentData)
-    
-    navigation.goToStep(step)
-  }, [navigation, form, updateFormData])
-  
-  // Submit handlers for each step
-  const submitStep1 = useCallback(async (data: Partial<AdhesionFormData>) => {
-    setSubmitting(true)
-    clearErrors()
-    
-    try {
-      const result = await createContact({
-        name: data.name!,
-        email: data.email!,
-        phone: data.phone!,
-      })
-      
-      if (result.success) {
-        updateFormData({ ...data, contactId: result.data?.contactId })
-        navigation.nextStep()
-      } else {
-        setErrors({ general: result.error || 'Erro ao criar contato' })
-        onSubmitError?.(result.error || 'Erro ao criar contato')
+    if (Object.keys(formData.urlParams || {}).length === 0) {
+      const params = new URLSearchParams(window.location.search)
+      const urlParams: UrlParams = {}
+      for (const [key, value] of params.entries()) {
+        urlParams[key] = value
       }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erro inesperado'
-      setErrors({ general: errorMessage })
-      onSubmitError?.(errorMessage)
-    } finally {
-      setSubmitting(false)
-    }
-  }, [setSubmitting, clearErrors, updateFormData, navigation, setErrors, onSubmitError])
-  
-  const submitStep2 = useCallback(async (data: Partial<AdhesionFormData>) => {
-    if (!formData.contactId) {
-      setErrors({ general: 'ID do contato não encontrado' })
-      return
-    }
-    
-    setSubmitting(true)
-    clearErrors()
-    
-    try {
-      const result = await validateSms({
-        contactId: formData.contactId,
-        smsCode: data.smsCode!,
-      })
-      
-      if (result.success && result.data?.isValid) {
-        updateFormData(data)
-        navigation.nextStep()
-      } else {
-        setErrors({ smsCode: 'Código SMS inválido' })
-        onSubmitError?.('Código SMS inválido')
+      if (Object.keys(urlParams).length > 0) {
+        updateFormData({ urlParams })
       }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erro inesperado'
-      setErrors({ general: errorMessage })
-      onSubmitError?.(errorMessage)
-    } finally {
-      setSubmitting(false)
     }
-  }, [formData.contactId, setSubmitting, clearErrors, updateFormData, navigation, setErrors, onSubmitError])
-  
-  const submitFinalStep = useCallback(async (data: AdhesionFormData) => {
-    setSubmitting(true)
-    clearErrors()
-    
-    try {
-      const completeData = { ...formData, ...data } as AdhesionFormData
-      const result = await submitAdhesion(completeData)
-      
-      if (result.success) {
-        onSubmitSuccess?.(result.data)
-      } else {
-        setErrors({ general: result.error || 'Erro ao finalizar adesão' })
-        onSubmitError?.(result.error || 'Erro ao finalizar adesão')
+  }, [formData.urlParams, updateFormData])
+
+  const handleApiError = (error: any, step: number) => {
+    const errorMessage = error.message || 'Ocorreu um erro inesperado.'
+    console.error(`Erro na Etapa ${step}:`, error)
+    setErrors({ general: errorMessage })
+    onSubmitError?.(errorMessage)
+  }
+
+  const submitStep1 = useCallback(
+    async (data: Partial<AdhesionFormData>) => {
+      setSubmitting(true)
+      clearErrors()
+
+      const [firstname, ...lastnameParts] = data.name!.trim().split(' ')
+      const lastname = lastnameParts.join(' ')
+
+      const payload: CreateContactPayload = {
+        ...(data as AdhesionFormData),
+        firstname,
+        lastname,
+        urlParams: formData.urlParams || {},
+        attempt: 1, // Criar funcionalidade de tentativas de envio
       }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erro inesperado'
-      setErrors({ general: errorMessage })
-      onSubmitError?.(errorMessage)
-    } finally {
-      setSubmitting(false)
-    }
-  }, [formData, setSubmitting, clearErrors, onSubmitSuccess, onSubmitError, setErrors])
-  
-  // Main submit handler
-  const onSubmit = handleSubmit(async (data) => {
-    const completeData = { ...formData, ...data }
-    
+
+      try {
+        const result = await handleStep1Submission(payload)
+
+        if (result.success) {
+          updateFormData({
+            ...data,
+            contactId: result.contact_id,
+            dealId: result.deal?.deal_id,
+          })
+          navigation.nextStep()
+        } else {
+          switch (result.code) {
+            case 'user_already_exist':
+            case 'cpf_or_cnpj_already_exist':
+              setErrors({
+                email: 'Este e-mail ou documento já está cadastrado.',
+              })
+              break
+            case 'go_to_whatsapp':
+              setErrors({
+                general:
+                  'Houve um problema. Por favor, entre em contato via WhatsApp.',
+              })
+              break
+            default:
+              setErrors({
+                general:
+                  result.error || 'Não foi possível processar sua solicitação.',
+              })
+              break
+          }
+          onSubmitError?.(result.error || 'Erro desconhecido na API')
+        }
+      } catch (error: any) {
+        handleApiError(error, 1)
+      } finally {
+        setSubmitting(false)
+      }
+    },
+    [
+      formData.urlParams,
+      setSubmitting,
+      clearErrors,
+      updateFormData,
+      navigation,
+      setErrors,
+      onSubmitError,
+    ]
+  )
+
+  const submitStep2 = useCallback(
+    async (data: Partial<AdhesionFormData>) => {
+      if (!formData.contactId || !data.smsCode) {
+        setErrors({ general: 'ID do Contato ou código SMS ausente.' })
+        return
+      }
+      setSubmitting(true)
+      clearErrors()
+      try {
+        const result = await validateSms({
+          contactId: formData.contactId,
+          smsCode: data.smsCode,
+        })
+        if (result.success) {
+          updateFormData(data)
+          navigation.nextStep()
+          onSubmitSuccess?.(result)
+        } else {
+          setErrors({ smsCode: result.error || 'Código SMS inválido.' })
+          onSubmitError?.(result.error || 'Código inválido.')
+        }
+      } catch (error: any) {
+        handleApiError(error, 2)
+      } finally {
+        setSubmitting(false)
+      }
+    },
+    [
+      formData.contactId,
+      setSubmitting,
+      clearErrors,
+      updateFormData,
+      navigation,
+      onSubmitSuccess,
+      onSubmitError,
+      setErrors,
+    ]
+  )
+
+  const onSubmit = form.handleSubmit(async (data) => {
     switch (currentStep) {
       case 1:
-        await submitStep1(completeData)
+        await submitStep1(data)
         break
       case 2:
-        await submitStep2(completeData)
-        break
-      case 3:
-        await submitFinalStep(completeData as AdhesionFormData)
+        await submitStep2(data)
         break
       default:
-        console.warn(`Etapa ${currentStep} não implementada`)
+        console.warn(
+          `Etapa ${currentStep} não possui uma ação de envio definida.`
+        )
     }
   })
-  
+
   return {
-    // Form instance
     form,
-    
-    // Current state
     currentStep,
-    formData,
     isSubmitting,
-    errors: { ...formErrors, ...storeErrors },
-    isValid,
-    
-    // Navigation
+    errors: { ...form.formState.errors, ...storeErrors },
     navigation: {
       ...navigation,
-      goToNextStep,
-      goToPreviousStep,
-      goToStep,
+      goToNextStep: form.handleSubmit(() => navigation.nextStep()),
     },
-    
-    // Actions
     onSubmit,
-    updateFormData,
     resetForm,
-    
-    // Step-specific helpers
-    canProceed: isValid && !isSubmitting,
-    currentStepSchema: stepSchemas[currentStep as keyof typeof stepSchemas],
   }
 }
 
