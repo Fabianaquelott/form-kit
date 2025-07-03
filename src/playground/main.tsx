@@ -11,10 +11,10 @@ async function enableMocking() {
   return worker.start({ onUnhandledRequest: 'bypass' });
 }
 
-enableMocking().then(() => {
-  ReactDOM.createRoot(document.getElementById('root')!).render(
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
-  );
-});
+// enableMocking().then(() => {
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+// });
