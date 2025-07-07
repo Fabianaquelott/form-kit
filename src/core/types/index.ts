@@ -1,5 +1,7 @@
 // src/core/types/index.ts
 
+import { FieldErrors } from 'react-hook-form'
+
 export interface UrlParams {
   hs_facebook_click_id?: string
   hs_google_click_id?: string
@@ -19,7 +21,7 @@ export interface Deal {
   cnpj?: string | null
   natureza_juridica?: string
   pipeline?: string
-  deal_stage?: string
+  dealstage?: string // Corrigido de deal_stage para dealstage
   utm_source?: string
   utm_content?: string
 }
@@ -31,8 +33,8 @@ export interface Contact {
   phone?: string
   firstname?: string
   lastname?: string
-  aceite_do_termo_de_adesao?: string
-  validacao_do_numero?: string
+  aceite_do_termo_de_adesao?: string // 'true' ou 'false'
+  validacao_do_numero?: string // 'true' ou 'false'
   deal?: Deal
 }
 
@@ -48,6 +50,7 @@ export interface AdhesionFormData {
   cpf?: string
   cnpj?: string
   contact?: Contact
+  attempt?: number
 }
 
 export interface CreateContactPayload extends Partial<AdhesionFormData> {
@@ -56,14 +59,17 @@ export interface CreateContactPayload extends Partial<AdhesionFormData> {
   attempt: number
 }
 
-export interface AdhesionFormState {
-  currentStep: number
-  totalSteps: number // Vamos aumentar para 4
-  data: Partial<AdhesionFormData>
-  isSubmitting: boolean
-  errors: Record<string, string>
+export type FormErrors = FieldErrors<AdhesionFormData> & {
+  general?: string
 }
 
+export interface AdhesionFormState {
+  currentStep: number
+  totalSteps: number
+  data: Partial<AdhesionFormData>
+  isSubmitting: boolean
+  errors: { general?: string; [key: string]: any } // Ajustado para aceitar o erro 'general'
+}
 export interface FormNavigationState {
   canGoNext: boolean
   canGoPrevious: boolean

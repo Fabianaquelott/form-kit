@@ -1,26 +1,17 @@
+// src/core/state/formStore.ts
+
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-
 import type { AdhesionFormState, AdhesionFormData } from '../types'
 
 interface FormStoreActions {
-  // Navegação
   setCurrentStep: (step: number) => void
   nextStep: () => void
   previousStep: () => void
-  
-  // Dados do formulário
   updateFormData: (data: Partial<AdhesionFormData>) => void
-  clearFormData: () => void
-  
-  // Estado de submissão
   setSubmitting: (isSubmitting: boolean) => void
-  
-  // Erros
   setErrors: (errors: Record<string, string>) => void
   clearErrors: () => void
-  
-  // Reset completo
   resetForm: () => void
 }
 
@@ -28,7 +19,7 @@ type FormStore = AdhesionFormState & FormStoreActions
 
 const initialState: AdhesionFormState = {
   currentStep: 1,
-  totalSteps: 3,
+  totalSteps: 5, // ATUALIZADO
   data: {},
   isSubmitting: false,
   errors: {},
@@ -38,7 +29,7 @@ export const useFormStore = create<FormStore>()(
   devtools(
     (set, get) => ({
       ...initialState,
-      
+
       setCurrentStep: (step: number) =>
         set(
           (state) => ({
@@ -47,7 +38,7 @@ export const useFormStore = create<FormStore>()(
           false,
           'setCurrentStep'
         ),
-      
+
       nextStep: () =>
         set(
           (state) => ({
@@ -56,7 +47,7 @@ export const useFormStore = create<FormStore>()(
           false,
           'nextStep'
         ),
-      
+
       previousStep: () =>
         set(
           (state) => ({
@@ -65,7 +56,7 @@ export const useFormStore = create<FormStore>()(
           false,
           'previousStep'
         ),
-      
+
       updateFormData: (newData: Partial<AdhesionFormData>) =>
         set(
           (state) => ({
@@ -74,41 +65,16 @@ export const useFormStore = create<FormStore>()(
           false,
           'updateFormData'
         ),
-      
-      clearFormData: () =>
-        set(
-          () => ({ data: {} }),
-          false,
-          'clearFormData'
-        ),
-      
+
+      clearErrors: () => set(() => ({ errors: {} }), false, 'clearErrors'),
+
       setSubmitting: (isSubmitting: boolean) =>
-        set(
-          () => ({ isSubmitting }),
-          false,
-          'setSubmitting'
-        ),
-      
+        set(() => ({ isSubmitting }), false, 'setSubmitting'),
+
       setErrors: (errors: Record<string, string>) =>
-        set(
-          () => ({ errors }),
-          false,
-          'setErrors'
-        ),
-      
-      clearErrors: () =>
-        set(
-          () => ({ errors: {} }),
-          false,
-          'clearErrors'
-        ),
-      
-      resetForm: () =>
-        set(
-          () => ({ ...initialState }),
-          false,
-          'resetForm'
-        ),
+        set(() => ({ errors }), false, 'setErrors'),
+
+      resetForm: () => set(() => ({ ...initialState }), false, 'resetForm'),
     }),
     {
       name: 'adhesion-form-store',
@@ -116,7 +82,6 @@ export const useFormStore = create<FormStore>()(
   )
 )
 
-// Seletores para facilitar o uso
 export const useCurrentStep = () => useFormStore((state) => state.currentStep)
 export const useFormData = () => useFormStore((state) => state.data)
 export const useIsSubmitting = () => useFormStore((state) => state.isSubmitting)

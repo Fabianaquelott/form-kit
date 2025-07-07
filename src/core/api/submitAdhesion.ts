@@ -52,7 +52,6 @@ async function apiRequest<T>(
 async function processNewUser(
   payload: CreateContactPayload
 ): Promise<ApiResponse<any>> {
-  // 1. Criar Contato
   const createContactResponse = await apiRequest('/v2/create-contact', {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -64,7 +63,6 @@ async function processNewUser(
 
   const contactId = createContactResponse.contact_id
 
-  // 2. Criar Deal
   const dealPayload = {
     contact_id: contactId,
     deal_name: payload.name,
@@ -81,7 +79,6 @@ async function processNewUser(
     )
   }
 
-  // 3. Enviar SMS
   const smsPayload = {
     contact_id: contactId,
     resend: false,

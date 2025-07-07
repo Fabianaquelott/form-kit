@@ -1,4 +1,6 @@
-import { useCallback, useEffect } from 'react'
+// src/core/useAdhesionForm.ts
+
+import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useFormStore } from './state/formStore'
@@ -8,8 +10,14 @@ import {
   handleStep1Submission,
   validateSms,
   getUserByEmail,
+  resendSms,
 } from './api/submitAdhesion'
-import type { AdhesionFormData, CreateContactPayload, UrlParams } from './types'
+import type {
+  AdhesionFormData,
+  CreateContactPayload,
+  UrlParams,
+  FormErrors,
+} from './types'
 
 export interface UseAdhesionFormOptions {
   onStepChange?: (step: number) => void
@@ -32,11 +40,23 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
   } = useFormStore()
   const navigation = useFormNavigation()
 
+  const [resendCooldown, setResendCooldown] = useState(0)
+
   const form = useForm<AdhesionFormSchema>({
     resolver: zodResolver(stepSchemas[currentStep as keyof typeof stepSchemas]),
     defaultValues: formData,
     mode: 'onBlur',
   })
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(
+        () => setResendCooldown(resendCooldown - 1),
+        1000
+      )
+      return () => clearTimeout(timer)
+    }
+  }, [resendCooldown])
 
   useEffect(() => {
     if (!formData.urlParams || Object.keys(formData.urlParams).length === 0) {
@@ -51,6 +71,10 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     }
   }, [formData.urlParams, updateFormData])
 
+  useEffect(() => {
+    onStepChange?.(currentStep)
+  }, [currentStep, onStepChange])
+
   const handleApiError = (error: any, step: number) => {
     const errorMessage = error.message || 'Ocorreu um erro inesperado.'
     console.error(`Erro na Etapa ${step}:`, error)
@@ -64,9 +88,24 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
 
       if (userResponse.success && userResponse.contact) {
         const contact = userResponse.contact
-        updateFormData({ contactId: contact.id, contact })
+        updateFormData({
+          contactId: contact.id,
+          name: `${contact.firstname} ${contact.lastname}`,
+          email: contact.email,
+          contact,
+        })
 
-        navigation.nextStep()
+        if (contact.aceite_do_termo_de_adesao === 'true') {
+          navigation.goToStep(5)
+          return
+        }
+
+        if (!contact.deal?.cpf && !contact.deal?.cnpj) {
+          navigation.goToStep(3)
+          return
+        }
+
+        navigation.goToStep(4)
       } else {
         setErrors({
           general:
@@ -86,12 +125,14 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       const [firstname, ...lastnameParts] = data.name!.trim().split(' ')
       const lastname = lastnameParts.join(' ')
 
+      const attempt = formData.attempt || 1
+
       const payload: CreateContactPayload = {
         ...(data as AdhesionFormData),
         firstname,
         lastname,
         urlParams: formData.urlParams || {},
-        attempt: 1,
+        attempt,
       }
 
       try {
@@ -108,6 +149,9 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
           if (result.code === 'user_already_exist') {
             await handleExistingUser(data.email!)
           } else {
+            if (result.code === 'did_you_mean_email') {
+              updateFormData({ attempt: (formData.attempt || 1) + 1 })
+            }
             setErrors({
               general:
                 result.error || 'Não foi possível processar sua solicitação.',
@@ -123,6 +167,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     },
     [
       formData.urlParams,
+      formData.attempt,
       handleExistingUser,
       setSubmitting,
       clearErrors,
@@ -172,6 +217,29 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     ]
   )
 
+  const handleResendSms = useCallback(async () => {
+    if (resendCooldown > 0 || !formData.contactId || !formData.phone) return
+
+    setSubmitting(true)
+    const result = await resendSms({
+      contactId: formData.contactId,
+      phone: formData.phone,
+    })
+    setSubmitting(false)
+
+    if (result.success) {
+      setResendCooldown(60)
+    } else {
+      setErrors({ general: result.error || 'Falha ao reenviar o código.' })
+    }
+  }, [
+    resendCooldown,
+    formData.contactId,
+    formData.phone,
+    setSubmitting,
+    setErrors,
+  ])
+
   const onSubmit = form.handleSubmit(async (data) => {
     switch (currentStep) {
       case 1:
@@ -187,17 +255,21 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     }
   })
 
+  const combinedErrors: FormErrors = {
+    ...form.formState.errors,
+    ...storeErrors,
+  }
+
   return {
     form,
     currentStep,
     isSubmitting,
-    errors: { ...form.formState.errors, ...storeErrors },
-    navigation: {
-      ...navigation,
-      goToNextStep: form.handleSubmit(() => navigation.nextStep()),
-    },
+    errors: combinedErrors,
+    navigation,
     onSubmit,
     resetForm,
+    handleResendSms,
+    resendCooldown,
   }
 }
 
