@@ -96,7 +96,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
 
       if (userResponse.success && userResponse.contact) {
         const contact = userResponse.contact
-        // CORREÇÃO: Garantindo que o dealId também seja salvo no estado
         updateFormData({
           contactId: contact.id,
           dealId: contact.deal?.id,
@@ -149,10 +148,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         const result = await handleStep1Submission(payload)
 
         if (result.success) {
+          // CORREÇÃO: Acessando o `deal_id` dentro do objeto `deal` aninhado
           updateFormData({
             ...data,
             contactId: result.contact_id,
-            dealId: result.deal?.id,
+            dealId: result.deal?.deal_id,
           })
           navigation.nextStep()
         } else {
@@ -227,12 +227,12 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
 
   const submitStep3 = useCallback(
     async (data: Partial<AdhesionFormData>) => {
-      // A validação agora usa os dados do formulário da Etapa 3 (`data`)
       const documentValue = data.documentType === 'cpf' ? data.cpf : data.cnpj
 
       if (
         !formData.contactId ||
         !formData.dealId ||
+        !formData.name ||
         !data.documentType ||
         !documentValue
       ) {
@@ -246,6 +246,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         const payload = {
           contactId: formData.contactId,
           dealId: formData.dealId,
+          contactName: formData.name,
           document: {
             type: data.documentType,
             value: documentValue,
@@ -271,6 +272,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     [
       formData.contactId,
       formData.dealId,
+      formData.name,
       setSubmitting,
       clearErrors,
       updateFormData,

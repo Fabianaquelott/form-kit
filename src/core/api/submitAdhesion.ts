@@ -93,7 +93,7 @@ async function processNewUser(
     throw new Error(sendSmsResponse.error || 'Falha ao enviar o código SMS.')
   }
 
-  return { ...createContactResponse, deal: createDealResponse.data }
+  return { ...createContactResponse, deal: createDealResponse }
 }
 
 // --- Funções Exportadas ---
@@ -143,6 +143,7 @@ export async function resendSms(payload: {
 export async function submitDocuments(payload: {
   contactId: string
   dealId: string
+  contactName: string
   document: { type: 'cpf' | 'cnpj'; value: string }
 }): Promise<ApiResponse<any>> {
   if (payload.document.type === 'cpf') {
@@ -163,6 +164,7 @@ export async function submitDocuments(payload: {
   const updateDealPayload: Partial<Deal> = {
     deal_id: payload.dealId,
     contact_id: payload.contactId,
+    deal_name: `${payload.contactName} - ${payload.document.type.toUpperCase()}: ${payload.document.value}`,
     [payload.document.type]: payload.document.value,
     natureza_juridica:
       payload.document.type === 'cpf' ? 'Pessoa Física' : 'Pessoa Jurídica',
