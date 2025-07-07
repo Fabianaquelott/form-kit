@@ -1,5 +1,3 @@
-// src/core/useAdhesionForm.ts
-
 import { useCallback, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -9,7 +7,7 @@ import { stepSchemas, type AdhesionFormSchema } from './schemas/adhesionSchema'
 import {
   handleStep1Submission,
   validateSms,
-  resendSms,
+  getUserByEmail,
 } from './api/submitAdhesion'
 import type { AdhesionFormData, CreateContactPayload, UrlParams } from './types'
 
@@ -20,7 +18,7 @@ export interface UseAdhesionFormOptions {
 }
 
 export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
-  const { onSubmitSuccess, onSubmitError } = options
+  const { onStepChange, onSubmitSuccess, onSubmitError } = options
   const {
     currentStep,
     data: formData,
@@ -40,9 +38,8 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     mode: 'onBlur',
   })
 
-  // Efeito para capturar os parâmetros da URL uma única vez
   useEffect(() => {
-    if (Object.keys(formData.urlParams || {}).length === 0) {
+    if (!formData.urlParams || Object.keys(formData.urlParams).length === 0) {
       const params = new URLSearchParams(window.location.search)
       const urlParams: UrlParams = {}
       for (const [key, value] of params.entries()) {
@@ -61,6 +58,26 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     onSubmitError?.(errorMessage)
   }
 
+  const handleExistingUser = useCallback(
+    async (email: string) => {
+      const userResponse = await getUserByEmail(email)
+
+      if (userResponse.success && userResponse.contact) {
+        const contact = userResponse.contact
+        updateFormData({ contactId: contact.id, contact })
+
+        navigation.nextStep()
+      } else {
+        setErrors({
+          general:
+            userResponse.error ||
+            'Não foi possível recuperar os dados do usuário.',
+        })
+      }
+    },
+    [updateFormData, navigation, setErrors]
+  )
+
   const submitStep1 = useCallback(
     async (data: Partial<AdhesionFormData>) => {
       setSubmitting(true)
@@ -74,7 +91,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         firstname,
         lastname,
         urlParams: formData.urlParams || {},
-        attempt: 1, // Criar funcionalidade de tentativas de envio
+        attempt: 1,
       }
 
       try {
@@ -88,27 +105,15 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
           })
           navigation.nextStep()
         } else {
-          switch (result.code) {
-            case 'user_already_exist':
-            case 'cpf_or_cnpj_already_exist':
-              setErrors({
-                email: 'Este e-mail ou documento já está cadastrado.',
-              })
-              break
-            case 'go_to_whatsapp':
-              setErrors({
-                general:
-                  'Houve um problema. Por favor, entre em contato via WhatsApp.',
-              })
-              break
-            default:
-              setErrors({
-                general:
-                  result.error || 'Não foi possível processar sua solicitação.',
-              })
-              break
+          if (result.code === 'user_already_exist') {
+            await handleExistingUser(data.email!)
+          } else {
+            setErrors({
+              general:
+                result.error || 'Não foi possível processar sua solicitação.',
+            })
+            onSubmitError?.(result.error || 'Erro desconhecido na API')
           }
-          onSubmitError?.(result.error || 'Erro desconhecido na API')
         }
       } catch (error: any) {
         handleApiError(error, 1)
@@ -118,6 +123,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     },
     [
       formData.urlParams,
+      handleExistingUser,
       setSubmitting,
       clearErrors,
       updateFormData,

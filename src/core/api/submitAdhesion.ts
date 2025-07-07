@@ -1,10 +1,6 @@
 // src/core/api/submitAdhesion.ts
 
-import type {
-  AdhesionFormData,
-  ApiResponse,
-  CreateContactPayload,
-} from '../types'
+import type { ApiResponse, Contact, CreateContactPayload } from '../types'
 
 const API_BASE_URL = '/api'
 const API_TIMEOUT = 15000
@@ -32,7 +28,7 @@ async function apiRequest<T>(
     if (!response.ok) {
       return {
         success: false,
-        error: responseData.message || `HTTP ${response.status}`,
+        error: responseData.message || `HTTP Error ${response.status}`,
         ...responseData,
       }
     }
@@ -46,9 +42,9 @@ async function apiRequest<T>(
     const errorMessage =
       error instanceof Error
         ? error.name === 'AbortError'
-          ? 'Timeout na requisição'
+          ? 'Timeout: A requisição demorou muito para responder.'
           : error.message
-        : 'Erro desconhecido'
+        : 'Ocorreu um erro desconhecido.'
     return { success: false, error: errorMessage }
   }
 }
@@ -63,10 +59,7 @@ async function processNewUser(
   })
 
   if (!createContactResponse.success || !createContactResponse.contact_id) {
-    if (createContactResponse.code) {
-      return createContactResponse
-    }
-    throw new Error(createContactResponse.error || 'Falha ao criar contato.')
+    return createContactResponse
   }
 
   const contactId = createContactResponse.contact_id
@@ -83,32 +76,42 @@ async function processNewUser(
   })
 
   if (!createDealResponse.success) {
-    throw new Error(createDealResponse.error || 'Falha ao criar negócio.')
+    throw new Error(
+      createDealResponse.error || 'Falha ao criar o negócio associado.'
+    )
   }
 
   // 3. Enviar SMS
   const smsPayload = {
     contact_id: contactId,
     resend: false,
-    phone: `+55${payload.phone.replace(/\D/g, '')}`,
+    phone: `+55${payload.phone?.replace(/\D/g, '')}`,
   }
-  // CORREÇÃO: Alterado de POST para PATCH
   const sendSmsResponse = await apiRequest('/v2/generate-code-sms', {
     method: 'PATCH',
     body: JSON.stringify(smsPayload),
   })
 
   if (!sendSmsResponse.success) {
-    throw new Error(sendSmsResponse.error || 'Falha ao enviar SMS.')
+    throw new Error(sendSmsResponse.error || 'Falha ao enviar o código SMS.')
   }
 
-  return { ...createContactResponse, deal: createDealResponse }
+  return { ...createContactResponse, deal: createDealResponse.data }
 }
 
 export async function handleStep1Submission(
   payload: CreateContactPayload
 ): Promise<ApiResponse<any>> {
   return processNewUser(payload)
+}
+
+export async function getUserByEmail(
+  email: string
+): Promise<ApiResponse<Contact>> {
+  const endpoint = `/get-contact-info?email=${encodeURIComponent(email)}`
+  return apiRequest<Contact>(endpoint, {
+    method: 'GET',
+  })
 }
 
 export async function validateSms(payload: {
@@ -127,9 +130,8 @@ export async function validateSms(payload: {
 export async function resendSms(payload: {
   contactId: string
   phone: string
-}): Promise<ApiResponse<{ sent: boolean }>> {
-  // CORREÇÃO: Alterado de POST para PATCH
-  return apiRequest<{ sent: boolean }>('/v2/generate-code-sms', {
+}): Promise<ApiResponse<any>> {
+  return apiRequest<any>('/v2/generate-code-sms', {
     method: 'PATCH',
     body: JSON.stringify({
       contact_id: payload.contactId,
