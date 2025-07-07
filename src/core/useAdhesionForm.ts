@@ -32,7 +32,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
   const { onStepChange, onSubmitSuccess, onSubmitError } = options
   const {
     currentStep,
-    data: formData,
+    data: formDataFromStore, // Renomeado para clareza
     isSubmitting,
     errors: storeErrors,
     updateFormData,
@@ -48,23 +48,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
 
   const form = useForm<AdhesionFormSchema>({
     resolver: zodResolver(stepSchemas[currentStep as keyof typeof stepSchemas]),
-    defaultValues: formData,
+    defaultValues: formDataFromStore,
     mode: 'onBlur',
   })
 
-  // Efeito para gerar o cupom de indicação na Etapa 5
-  useEffect(() => {
-    if (currentStep === 5 && formData.contactId && !referralCoupon) {
-      const contactIdNumber = parseInt(formData.contactId, 10)
-      if (!isNaN(contactIdNumber)) {
-        const calculatedId = contactIdNumber + 16 + 452
-        const coupon = `10${calculatedId.toString(16)}`.toUpperCase()
-        setReferralCoupon(coupon)
-        updateFormData({ referralCoupon: coupon })
-      }
-    }
-  }, [currentStep, formData.contactId, referralCoupon, updateFormData])
-
+  // Sincroniza o estado do formulário (controlado pelo RHF) com o nosso estado global (Zustand)
   useEffect(() => {
     const subscription = form.watch((value) => {
       updateFormData(value as Partial<AdhesionFormData>)
@@ -72,6 +60,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     return () => subscription.unsubscribe()
   }, [form, updateFormData])
 
+  // Efeito para o timer de reenvio do SMS
   useEffect(() => {
     if (resendCooldown > 0) {
       const timer = setTimeout(
@@ -82,8 +71,12 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     }
   }, [resendCooldown])
 
+  // Efeito para capturar parâmetros de URL na primeira renderização
   useEffect(() => {
-    if (!formData.urlParams || Object.keys(formData.urlParams).length === 0) {
+    if (
+      !formDataFromStore.urlParams ||
+      Object.keys(formDataFromStore.urlParams).length === 0
+    ) {
       const params = new URLSearchParams(window.location.search)
       const urlParams: UrlParams = {}
       for (const [key, value] of params.entries()) {
@@ -93,11 +86,25 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         updateFormData({ urlParams })
       }
     }
-  }, [formData.urlParams, updateFormData])
+  }, [formDataFromStore.urlParams, updateFormData])
 
+  // Efeito para notificar sobre a mudança de etapa
   useEffect(() => {
     onStepChange?.(currentStep)
   }, [currentStep, onStepChange])
+
+  // Efeito para gerar o cupom de indicação na Etapa 5
+  useEffect(() => {
+    if (currentStep === 5 && formDataFromStore.contactId && !referralCoupon) {
+      const contactIdNumber = parseInt(formDataFromStore.contactId, 10)
+      if (!isNaN(contactIdNumber)) {
+        const calculatedId = contactIdNumber + 16 + 452
+        const coupon = `10${calculatedId.toString(16)}`.toUpperCase()
+        setReferralCoupon(coupon)
+        updateFormData({ referralCoupon: coupon })
+      }
+    }
+  }, [currentStep, formDataFromStore.contactId, referralCoupon, updateFormData])
 
   const handleApiError = (error: any, step: number) => {
     const errorMessage = error.message || 'Ocorreu um erro inesperado.'
@@ -109,7 +116,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
   const handleExistingUser = useCallback(
     async (email: string) => {
       const userResponse = await getUserByEmail(email)
-
       if (userResponse.success && userResponse.contact) {
         const contact = userResponse.contact
         updateFormData({
@@ -119,17 +125,14 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
           email: contact.email,
           contact,
         })
-
         if (contact.aceite_do_termo_de_adesao === 'true') {
           navigation.goToStep(5)
           return
         }
-
         if (!contact.deal?.cpf && !contact.deal?.cnpj) {
           navigation.goToStep(3)
           return
         }
-
         navigation.goToStep(4)
       } else {
         setErrors({
@@ -146,23 +149,20 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     async (data: Partial<AdhesionFormData>) => {
       setSubmitting(true)
       clearErrors()
-
       const [firstname, ...lastnameParts] = data.name!.trim().split(' ')
       const lastname = lastnameParts.join(' ')
-
-      const attempt = formData.attempt || 1
-
+      const attempt = useFormStore.getState().data.attempt || 1
+      const urlParams = useFormStore.getState().data.urlParams || {}
       const payload: CreateContactPayload = {
         ...(data as AdhesionFormData),
         firstname,
         lastname,
-        urlParams: formData.urlParams || {},
+        urlParams,
         attempt,
       }
 
       try {
         const result = await handleStep1Submission(payload)
-
         if (result.success) {
           updateFormData({
             ...data,
@@ -175,13 +175,13 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
             await handleExistingUser(data.email!)
           } else {
             if (result.code === 'did_you_mean_email') {
-              updateFormData({ attempt: (formData.attempt || 1) + 1 })
+              updateFormData({ attempt: attempt + 1 })
             }
             setErrors({
               general:
                 result.error || 'Não foi possível processar sua solicitação.',
             })
-            onSubmitError?.(result.error || 'Erro desconhecido na API')
+            onSubmitError?.(result.error || 'Erro desconhecido')
           }
         }
       } catch (error: any) {
@@ -191,8 +191,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
     },
     [
-      formData.urlParams,
-      formData.attempt,
       handleExistingUser,
       setSubmitting,
       clearErrors,
@@ -205,7 +203,8 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
 
   const submitStep2 = useCallback(
     async (data: Partial<AdhesionFormData>) => {
-      if (!formData.contactId || !data.smsCode) {
+      const currentState = useFormStore.getState().data
+      if (!currentState.contactId || !data.smsCode) {
         setErrors({ general: 'ID do Contato ou código SMS ausente.' })
         return
       }
@@ -213,7 +212,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       clearErrors()
       try {
         const result = await validateSms({
-          contactId: formData.contactId,
+          contactId: currentState.contactId,
           smsCode: data.smsCode,
         })
         if (result.success) {
@@ -230,24 +229,23 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
     },
     [
-      formData.contactId,
       setSubmitting,
       clearErrors,
       updateFormData,
       navigation,
-      onSubmitError,
       setErrors,
+      onSubmitError,
     ]
   )
 
   const submitStep3 = useCallback(
     async (data: Partial<AdhesionFormData>) => {
+      const currentState = useFormStore.getState().data
       const documentValue = data.documentType === 'cpf' ? data.cpf : data.cnpj
-
       if (
-        !formData.contactId ||
-        !formData.dealId ||
-        !formData.name ||
+        !currentState.contactId ||
+        !currentState.dealId ||
+        !currentState.name ||
         !data.documentType ||
         !documentValue
       ) {
@@ -256,19 +254,14 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
       setSubmitting(true)
       clearErrors()
-
       try {
         const payload = {
-          contactId: formData.contactId,
-          dealId: formData.dealId,
-          contactName: formData.name,
-          document: {
-            type: data.documentType,
-            value: documentValue,
-          },
+          contactId: currentState.contactId,
+          dealId: currentState.dealId,
+          contactName: currentState.name,
+          document: { type: data.documentType, value: documentValue },
         }
         const result = await submitDocuments(payload)
-
         if (result.success) {
           updateFormData(data)
           navigation.nextStep()
@@ -285,9 +278,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
     },
     [
-      formData.contactId,
-      formData.dealId,
-      formData.name,
       setSubmitting,
       clearErrors,
       updateFormData,
@@ -299,29 +289,24 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
 
   const submitStep4 = useCallback(
     async (data: Partial<AdhesionFormData>) => {
-      if (!formData.contactId) {
+      const currentState = useFormStore.getState().data
+      if (!currentState.contactId) {
         setErrors({ general: 'ID do Contato não encontrado.' })
         return
       }
       setSubmitting(true)
       clearErrors()
-
       try {
         const payload: AcceptContractPayload = {
-          contact_id: formData.contactId,
+          contact_id: currentState.contactId,
           cupom_indicacao: data.coupon || undefined,
           app: false,
         }
-
         const result = await acceptContract(payload)
-
         if (result.success) {
-          updateFormData({
-            ...data,
-            contact: result.contact,
-          })
+          updateFormData({ ...data, contact: result.contact })
           navigation.nextStep()
-          onSubmitSuccess?.(result) // Dispara o sucesso geral ao chegar na última etapa
+          onSubmitSuccess?.(result)
         } else {
           setErrors({
             general: result.error || 'Não foi possível aceitar o contrato.',
@@ -335,7 +320,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
     },
     [
-      formData.contactId,
       setSubmitting,
       clearErrors,
       updateFormData,
@@ -347,27 +331,21 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
   )
 
   const handleResendSms = useCallback(async () => {
-    if (resendCooldown > 0 || !formData.contactId || !formData.phone) return
-
+    const currentState = useFormStore.getState().data
+    if (resendCooldown > 0 || !currentState.contactId || !currentState.phone)
+      return
     setSubmitting(true)
     const result = await resendSms({
-      contactId: formData.contactId,
-      phone: formData.phone,
+      contactId: currentState.contactId,
+      phone: currentState.phone,
     })
     setSubmitting(false)
-
     if (result.success) {
       setResendCooldown(60)
     } else {
       setErrors({ general: result.error || 'Falha ao reenviar o código.' })
     }
-  }, [
-    resendCooldown,
-    formData.contactId,
-    formData.phone,
-    setSubmitting,
-    setErrors,
-  ])
+  }, [resendCooldown, setSubmitting, setErrors])
 
   const onSubmit = form.handleSubmit(async (data) => {
     switch (currentStep) {
@@ -384,8 +362,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         await submitStep4(data)
         break
       case 5:
-        // A etapa 5 é apenas de visualização, não tem submissão.
-        // Opcionalmente, pode-se chamar o reset aqui ou em um botão específico.
         console.log('Fluxo finalizado!')
         break
       default:
