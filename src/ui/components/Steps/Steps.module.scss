@@ -65,3 +65,38 @@
   align-items: center;
   gap: var(--space-2);
 }
+
+.referralBox {
+  border: 2px dashed var(--color-primary-300);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  text-align: center;
+  background-color: var(--color-primary-50);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  h3 {
+    font-size: var(--text-xl);
+    font-weight: var(--font-bold);
+    color: var(--color-primary-800);
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-primary-700);
+  }
+}
+
+.couponCode {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-primary-200);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  font-family: var(--font-mono);
+  color: var(--color-primary-900);
+  letter-spacing: 2px;
+}

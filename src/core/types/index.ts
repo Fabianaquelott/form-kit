@@ -62,6 +62,9 @@ export interface AdhesionFormData {
   // Etapa 4
   coupon?: string
   termsAcceptedStep4?: boolean
+
+  // Etapa 5
+  referralCoupon?: string // <<< PROPRIEDADE ADICIONADA
 }
 
 export interface CreateContactPayload extends Partial<AdhesionFormData> {

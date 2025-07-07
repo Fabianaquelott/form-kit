@@ -36,6 +36,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
     onSubmit,
     handleResendSms,
     resendCooldown,
+    referralCoupon,
   } = formMethods
 
   const renderStep1 = () => (
@@ -97,7 +98,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
       case 2: return renderStep2();
       case 3: return <Step3_Document />;
       case 4: return <Step4_Contract />;
-      case 5: return <Step5_Complete />;
+      case 5: return <Step5_Complete referralCoupon={referralCoupon} />;
       default: return <div>Etapa não encontrada</div>;
     }
   }
@@ -124,16 +125,18 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
                 {errors.general}
               </div>
             )}
-            <div className={styles.navigation}>
-              {navigation.canGoPrevious && (
-                <Button type="button" variant="outline" onClick={navigation.previousStep} disabled={isSubmitting}>
-                  Voltar
+            {currentStep < 5 && (
+              <div className={styles.navigation}>
+                {navigation.canGoPrevious && (
+                  <Button type="button" variant="outline" onClick={navigation.previousStep} disabled={isSubmitting}>
+                    Voltar
+                  </Button>
+                )}
+                <Button type="submit" isLoading={isSubmitting} disabled={isSubmitting}>
+                  {navigation.isLastStep ? 'Finalizar' : 'Continuar'}
                 </Button>
-              )}
-              <Button type="submit" isLoading={isSubmitting} disabled={isSubmitting}>
-                {navigation.isLastStep ? 'Finalizar' : 'Continuar'}
-              </Button>
-            </div>
+              </div>
+            )}
           </form>
         </FormProvider>
       </div>

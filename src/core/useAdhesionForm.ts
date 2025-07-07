@@ -44,12 +44,26 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
   const navigation = useFormNavigation()
 
   const [resendCooldown, setResendCooldown] = useState(0)
+  const [referralCoupon, setReferralCoupon] = useState<string | null>(null)
 
   const form = useForm<AdhesionFormSchema>({
     resolver: zodResolver(stepSchemas[currentStep as keyof typeof stepSchemas]),
     defaultValues: formData,
     mode: 'onBlur',
   })
+
+  // Efeito para gerar o cupom de indicação na Etapa 5
+  useEffect(() => {
+    if (currentStep === 5 && formData.contactId && !referralCoupon) {
+      const contactIdNumber = parseInt(formData.contactId, 10)
+      if (!isNaN(contactIdNumber)) {
+        const calculatedId = contactIdNumber + 16 + 452
+        const coupon = `10${calculatedId.toString(16)}`.toUpperCase()
+        setReferralCoupon(coupon)
+        updateFormData({ referralCoupon: coupon })
+      }
+    }
+  }, [currentStep, formData.contactId, referralCoupon, updateFormData])
 
   useEffect(() => {
     const subscription = form.watch((value) => {
@@ -307,6 +321,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
             contact: result.contact,
           })
           navigation.nextStep()
+          onSubmitSuccess?.(result) // Dispara o sucesso geral ao chegar na última etapa
         } else {
           setErrors({
             general: result.error || 'Não foi possível aceitar o contrato.',
@@ -326,6 +341,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       updateFormData,
       navigation,
       setErrors,
+      onSubmitSuccess,
       onSubmitError,
     ]
   )
@@ -367,6 +383,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       case 4:
         await submitStep4(data)
         break
+      case 5:
+        // A etapa 5 é apenas de visualização, não tem submissão.
+        // Opcionalmente, pode-se chamar o reset aqui ou em um botão específico.
+        console.log('Fluxo finalizado!')
+        break
       default:
         console.warn(
           `Etapa ${currentStep} não possui uma ação de envio definida.`
@@ -389,6 +410,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     resetForm,
     handleResendSms,
     resendCooldown,
+    referralCoupon,
   }
 }
 
