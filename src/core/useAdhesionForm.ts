@@ -12,12 +12,14 @@ import {
   getUserByEmail,
   resendSms,
   submitDocuments,
+  acceptContract,
 } from './api/submitAdhesion'
 import type {
   AdhesionFormData,
   CreateContactPayload,
   UrlParams,
   FormErrors,
+  AcceptContractPayload,
 } from './types'
 
 export interface UseAdhesionFormOptions {
@@ -148,7 +150,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         const result = await handleStep1Submission(payload)
 
         if (result.success) {
-          // CORREÇÃO: Acessando o `deal_id` dentro do objeto `deal` aninhado
           updateFormData({
             ...data,
             contactId: result.contact_id,
@@ -282,6 +283,53 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     ]
   )
 
+  const submitStep4 = useCallback(
+    async (data: Partial<AdhesionFormData>) => {
+      if (!formData.contactId) {
+        setErrors({ general: 'ID do Contato não encontrado.' })
+        return
+      }
+      setSubmitting(true)
+      clearErrors()
+
+      try {
+        const payload: AcceptContractPayload = {
+          contact_id: formData.contactId,
+          cupom_indicacao: data.coupon || undefined,
+          app: false,
+        }
+
+        const result = await acceptContract(payload)
+
+        if (result.success) {
+          updateFormData({
+            ...data,
+            contact: result.contact,
+          })
+          navigation.nextStep()
+        } else {
+          setErrors({
+            general: result.error || 'Não foi possível aceitar o contrato.',
+          })
+          onSubmitError?.(result.error || 'Erro ao aceitar o contrato.')
+        }
+      } catch (error: any) {
+        handleApiError(error, 4)
+      } finally {
+        setSubmitting(false)
+      }
+    },
+    [
+      formData.contactId,
+      setSubmitting,
+      clearErrors,
+      updateFormData,
+      navigation,
+      setErrors,
+      onSubmitError,
+    ]
+  )
+
   const handleResendSms = useCallback(async () => {
     if (resendCooldown > 0 || !formData.contactId || !formData.phone) return
 
@@ -315,6 +363,9 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         break
       case 3:
         await submitStep3(data)
+        break
+      case 4:
+        await submitStep4(data)
         break
       default:
         console.warn(

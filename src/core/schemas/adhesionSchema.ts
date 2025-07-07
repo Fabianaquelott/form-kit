@@ -29,7 +29,6 @@ const isValidCPF = (cpf: string) => {
 
 // --- Schemas por Etapa ---
 
-// Etapa 1: Dados pessoais
 export const personalDataSchema = z.object({
   name: z
     .string({ required_error: 'O nome completo é obrigatório.' })
@@ -57,12 +56,10 @@ export const personalDataSchema = z.object({
   }),
 })
 
-// Etapa 2: Validação SMS
 export const smsValidationSchema = z.object({
   smsCode: z.string().length(6, 'O código deve ter 6 dígitos.'),
 })
 
-// Etapa 3: Documentos
 const baseDocumentSchema = z.object({
   documentType: z.enum(['cpf', 'cnpj']),
   cpf: z.string().optional(),
@@ -79,7 +76,16 @@ export const documentSchema = baseDocumentSchema.superRefine((data, ctx) => {
       })
     }
   }
-  // Adicionar validação de CNPJ aqui no futuro
+})
+
+export const contractSchema = z.object({
+  coupon: z
+    .string()
+    .max(30, 'O cupom não pode ter mais de 30 caracteres.')
+    .optional(),
+  termsAcceptedStep4: z.boolean().refine((val) => val === true, {
+    message: 'Você precisa aceitar o termo de adesão para finalizar.',
+  }),
 })
 
 // --- Schema Completo e Tipos ---
@@ -87,11 +93,13 @@ export const documentSchema = baseDocumentSchema.superRefine((data, ctx) => {
 export const adhesionFormSchema = personalDataSchema
   .merge(smsValidationSchema.partial())
   .merge(baseDocumentSchema.partial())
+  .merge(contractSchema.partial())
 
 // Tipos inferidos
 export type PersonalDataForm = z.infer<typeof personalDataSchema>
 export type SmsValidationForm = z.infer<typeof smsValidationSchema>
 export type DocumentForm = z.infer<typeof documentSchema>
+export type ContractForm = z.infer<typeof contractSchema>
 export type AdhesionFormSchema = z.infer<typeof adhesionFormSchema>
 
 // Schemas por etapa
@@ -99,6 +107,7 @@ export const stepSchemas = {
   1: personalDataSchema,
   2: smsValidationSchema,
   3: documentSchema,
+  4: contractSchema,
 } as const
 
 export type StepNumber = keyof typeof stepSchemas

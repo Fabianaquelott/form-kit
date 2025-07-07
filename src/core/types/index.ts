@@ -16,7 +16,7 @@ export interface UrlParams {
 export interface Deal {
   id?: string
   deal_id?: string
-  contact_id?: string // <<< PROPRIEDADE ADICIONADA
+  contact_id?: string
   deal_name?: string
   cpf?: string | null
   cnpj?: string | null
@@ -40,6 +40,7 @@ export interface Contact {
 }
 
 export interface AdhesionFormData {
+  // Etapa 1
   name: string
   email: string
   phone: string
@@ -47,18 +48,33 @@ export interface AdhesionFormData {
   contactId?: string
   dealId?: string
   urlParams?: UrlParams
-  smsCode?: string
-  documentType?: 'cpf' | 'cnpj' // <<< PROPRIEDADE ADICIONADA
-  cpf?: string
-  cnpj?: string
   contact?: Contact
   attempt?: number
+
+  // Etapa 2
+  smsCode?: string
+
+  // Etapa 3
+  documentType?: 'cpf' | 'cnpj'
+  cpf?: string
+  cnpj?: string
+
+  // Etapa 4
+  coupon?: string
+  termsAcceptedStep4?: boolean
 }
 
 export interface CreateContactPayload extends Partial<AdhesionFormData> {
   firstname: string
   lastname: string
   attempt: number
+}
+
+export interface AcceptContractPayload {
+  contact_id: string
+  cupom_indicacao?: string
+  utm_indique_ganhe?: boolean
+  app?: boolean
 }
 
 export type FormErrors = FieldErrors<AdhesionFormData> & {

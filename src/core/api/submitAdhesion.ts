@@ -1,6 +1,12 @@
 // src/core/api/submitAdhesion.ts
 
-import type { ApiResponse, Contact, CreateContactPayload, Deal } from '../types'
+import type {
+  ApiResponse,
+  Contact,
+  CreateContactPayload,
+  Deal,
+  AcceptContractPayload,
+} from '../types'
 
 const API_BASE_URL = '/api'
 const API_TIMEOUT = 15000
@@ -176,4 +182,13 @@ export async function submitDocuments(payload: {
   })
 
   return updateDealResponse
+}
+
+export async function acceptContract(
+  payload: AcceptContractPayload
+): Promise<ApiResponse<any>> {
+  return apiRequest<any>('/accept-contract', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  })
 }
