@@ -1,6 +1,7 @@
 // src/ui/DefaultAdhesionForm.tsx
 
 import React from 'react'
+import { FormProvider } from 'react-hook-form'
 import { useAdhesionForm } from '@/core'
 import { Button } from './components/Button/Button'
 import { Input } from './components/Input/Input'
@@ -22,8 +23,12 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
   onError,
   className,
 }) => {
+  const formMethods = useAdhesionForm({
+    onSubmitSuccess: onSuccess,
+    onSubmitError: onError,
+  })
+
   const {
-    form,
     currentStep,
     isSubmitting,
     errors,
@@ -31,12 +36,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
     onSubmit,
     handleResendSms,
     resendCooldown,
-  } = useAdhesionForm({
-    onSubmitSuccess: onSuccess,
-    onSubmitError: onError,
-  })
-
-  const { register, formState: { errors: formErrors } } = form
+  } = formMethods
 
   const renderStep1 = () => (
     <div className={styles.step}>
@@ -47,15 +47,15 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
         </p>
       </div>
       <div className={styles.stepContent}>
-        <Input {...register('name')} label="Nome completo" errorMessage={formErrors.name?.message} required fullWidth />
-        <Input {...register('email')} type="email" label="E-mail" errorMessage={formErrors.email?.message} required fullWidth />
-        <Input {...register('phone')} type="tel" label="Telefone" errorMessage={formErrors.phone?.message} required fullWidth />
+        <Input {...formMethods.form.register('name')} label="Nome completo" errorMessage={errors.name?.message} required fullWidth />
+        <Input {...formMethods.form.register('email')} type="email" label="E-mail" errorMessage={errors.email?.message} required fullWidth />
+        <Input {...formMethods.form.register('phone')} type="tel" label="Telefone" errorMessage={errors.phone?.message} required fullWidth />
         <div className={styles.checkboxContainer}>
-          <input {...register('termsAccepted')} type="checkbox" id="terms" className={styles.checkbox} />
+          <input {...formMethods.form.register('termsAccepted')} type="checkbox" id="terms" className={styles.checkbox} />
           <Label htmlFor="terms" className={styles.checkboxLabel}>
             Li e concordo com os <a href="#" className={styles.link}>termos e condições</a>.
           </Label>
-          {formErrors.termsAccepted && <div className={styles.errorMessage}>{formErrors.termsAccepted.message}</div>}
+          {errors.termsAccepted && <div className={styles.errorMessage}>{errors.termsAccepted.message}</div>}
         </div>
       </div>
     </div>
@@ -71,7 +71,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
       </div>
       <div className={styles.stepContent}>
         <Input
-          {...register('smsCode')}
+          {...formMethods.form.register('smsCode')}
           label="Código SMS"
           maxLength={6}
           errorMessage={errors.smsCode?.message || (currentStep === 2 ? errors.general : '')}
@@ -116,24 +116,26 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
             Etapa {currentStep} de 5
           </span>
         </div>
-        <form onSubmit={onSubmit} className={styles.form}>
-          {renderCurrentStep()}
-          {errors.general && currentStep !== 2 && (
-            <div className={styles.generalError} role="alert">
-              {errors.general}
-            </div>
-          )}
-          <div className={styles.navigation}>
-            {navigation.canGoPrevious && (
-              <Button type="button" variant="outline" onClick={navigation.previousStep} disabled={isSubmitting}>
-                Voltar
-              </Button>
+        <FormProvider {...formMethods.form}>
+          <form onSubmit={onSubmit} className={styles.form}>
+            {renderCurrentStep()}
+            {errors.general && currentStep !== 2 && (
+              <div className={styles.generalError} role="alert">
+                {errors.general}
+              </div>
             )}
-            <Button type="submit" isLoading={isSubmitting} disabled={isSubmitting}>
-              {navigation.isLastStep ? 'Finalizar' : 'Continuar'}
-            </Button>
-          </div>
-        </form>
+            <div className={styles.navigation}>
+              {navigation.canGoPrevious && (
+                <Button type="button" variant="outline" onClick={navigation.previousStep} disabled={isSubmitting}>
+                  Voltar
+                </Button>
+              )}
+              <Button type="submit" isLoading={isSubmitting} disabled={isSubmitting}>
+                {navigation.isLastStep ? 'Finalizar' : 'Continuar'}
+              </Button>
+            </div>
+          </form>
+        </FormProvider>
       </div>
     </div>
   )

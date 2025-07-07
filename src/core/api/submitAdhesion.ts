@@ -1,6 +1,6 @@
 // src/core/api/submitAdhesion.ts
 
-import type { ApiResponse, Contact, CreateContactPayload } from '../types'
+import type { ApiResponse, Contact, CreateContactPayload, Deal } from '../types'
 
 const API_BASE_URL = '/api'
 const API_TIMEOUT = 15000
@@ -96,6 +96,8 @@ async function processNewUser(
   return { ...createContactResponse, deal: createDealResponse.data }
 }
 
+// --- Funções Exportadas ---
+
 export async function handleStep1Submission(
   payload: CreateContactPayload
 ): Promise<ApiResponse<any>> {
@@ -136,4 +138,40 @@ export async function resendSms(payload: {
       resend: true,
     }),
   })
+}
+
+export async function submitDocuments(payload: {
+  contactId: string
+  dealId: string
+  document: { type: 'cpf' | 'cnpj'; value: string }
+}): Promise<ApiResponse<any>> {
+  if (payload.document.type === 'cpf') {
+    const updateCpfPayload = {
+      contact_id: payload.contactId,
+      cpf: payload.document.value,
+    }
+    const updateCpfResponse = await apiRequest(`/v2/update-contact-cpf`, {
+      method: 'PATCH',
+      body: JSON.stringify(updateCpfPayload),
+    })
+
+    if (!updateCpfResponse.success) {
+      return updateCpfResponse
+    }
+  }
+
+  const updateDealPayload: Partial<Deal> = {
+    deal_id: payload.dealId,
+    contact_id: payload.contactId,
+    [payload.document.type]: payload.document.value,
+    natureza_juridica:
+      payload.document.type === 'cpf' ? 'Pessoa Física' : 'Pessoa Jurídica',
+  }
+
+  const updateDealResponse = await apiRequest('/v2/update-deal', {
+    method: 'PATCH',
+    body: JSON.stringify(updateDealPayload),
+  })
+
+  return updateDealResponse
 }

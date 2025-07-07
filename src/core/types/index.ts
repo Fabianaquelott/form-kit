@@ -16,12 +16,13 @@ export interface UrlParams {
 export interface Deal {
   id?: string
   deal_id?: string
+  contact_id?: string // <<< PROPRIEDADE ADICIONADA
   deal_name?: string
   cpf?: string | null
   cnpj?: string | null
   natureza_juridica?: string
   pipeline?: string
-  dealstage?: string // Corrigido de deal_stage para dealstage
+  dealstage?: string
   utm_source?: string
   utm_content?: string
 }
@@ -33,8 +34,8 @@ export interface Contact {
   phone?: string
   firstname?: string
   lastname?: string
-  aceite_do_termo_de_adesao?: string // 'true' ou 'false'
-  validacao_do_numero?: string // 'true' ou 'false'
+  aceite_do_termo_de_adesao?: string
+  validacao_do_numero?: string
   deal?: Deal
 }
 
@@ -47,6 +48,7 @@ export interface AdhesionFormData {
   dealId?: string
   urlParams?: UrlParams
   smsCode?: string
+  documentType?: 'cpf' | 'cnpj' // <<< PROPRIEDADE ADICIONADA
   cpf?: string
   cnpj?: string
   contact?: Contact
@@ -68,8 +70,9 @@ export interface AdhesionFormState {
   totalSteps: number
   data: Partial<AdhesionFormData>
   isSubmitting: boolean
-  errors: { general?: string; [key: string]: any } // Ajustado para aceitar o erro 'general'
+  errors: { general?: string; [key: string]: any }
 }
+
 export interface FormNavigationState {
   canGoNext: boolean
   canGoPrevious: boolean

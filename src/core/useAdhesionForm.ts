@@ -11,6 +11,7 @@ import {
   validateSms,
   getUserByEmail,
   resendSms,
+  submitDocuments,
 } from './api/submitAdhesion'
 import type {
   AdhesionFormData,
@@ -47,6 +48,13 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     defaultValues: formData,
     mode: 'onBlur',
   })
+
+  useEffect(() => {
+    const subscription = form.watch((value) => {
+      updateFormData(value as Partial<AdhesionFormData>)
+    })
+    return () => subscription.unsubscribe()
+  }, [form, updateFormData])
 
   useEffect(() => {
     if (resendCooldown > 0) {
@@ -88,8 +96,10 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
 
       if (userResponse.success && userResponse.contact) {
         const contact = userResponse.contact
+        // CORREÇÃO: Garantindo que o dealId também seja salvo no estado
         updateFormData({
           contactId: contact.id,
+          dealId: contact.deal?.id,
           name: `${contact.firstname} ${contact.lastname}`,
           email: contact.email,
           contact,
@@ -142,7 +152,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
           updateFormData({
             ...data,
             contactId: result.contact_id,
-            dealId: result.deal?.deal_id,
+            dealId: result.deal?.id,
           })
           navigation.nextStep()
         } else {
@@ -194,7 +204,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         if (result.success) {
           updateFormData(data)
           navigation.nextStep()
-          onSubmitSuccess?.(result)
         } else {
           setErrors({ smsCode: result.error || 'Código SMS inválido.' })
           onSubmitError?.(result.error || 'Código inválido.')
@@ -211,9 +220,63 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       clearErrors,
       updateFormData,
       navigation,
-      onSubmitSuccess,
       onSubmitError,
       setErrors,
+    ]
+  )
+
+  const submitStep3 = useCallback(
+    async (data: Partial<AdhesionFormData>) => {
+      // A validação agora usa os dados do formulário da Etapa 3 (`data`)
+      const documentValue = data.documentType === 'cpf' ? data.cpf : data.cnpj
+
+      if (
+        !formData.contactId ||
+        !formData.dealId ||
+        !data.documentType ||
+        !documentValue
+      ) {
+        setErrors({ general: 'Dados insuficientes para enviar o documento.' })
+        return
+      }
+      setSubmitting(true)
+      clearErrors()
+
+      try {
+        const payload = {
+          contactId: formData.contactId,
+          dealId: formData.dealId,
+          document: {
+            type: data.documentType,
+            value: documentValue,
+          },
+        }
+        const result = await submitDocuments(payload)
+
+        if (result.success) {
+          updateFormData(data)
+          navigation.nextStep()
+        } else {
+          setErrors({
+            general: result.error || 'Não foi possível validar seu documento.',
+          })
+          onSubmitError?.(result.error || 'Erro ao enviar documento.')
+        }
+      } catch (error: any) {
+        handleApiError(error, 3)
+      } finally {
+        setSubmitting(false)
+      }
+    },
+    [
+      formData.contactId,
+      formData.dealId,
+      setSubmitting,
+      clearErrors,
+      updateFormData,
+      navigation,
+      setErrors,
+      onSubmitError,
     ]
   )
 
@@ -247,6 +310,9 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         break
       case 2:
         await submitStep2(data)
+        break
+      case 3:
+        await submitStep3(data)
         break
       default:
         console.warn(

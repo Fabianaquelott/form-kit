@@ -1,13 +1,35 @@
+// src/core/schemas/adhesionSchema.ts
+
 import { z } from 'zod'
 
-// Regex para validar nomes, aceitando caracteres comuns em nomes brasileiros e latinos.
+// --- Funções Utilitárias de Validação ---
 const NAME_REGEX = /^[a-zA-Z\u00C0-\u017F´`~^. ]+$/
-
-// Regex aprimorada para telefones brasileiros, aceitando DDD 00.
 const BRAZILIAN_PHONE_REGEX =
   /^(?:\(?([0-9]{2})\)?\s?)?(?:((?:9\d|[2-9])\d{3})-?(\d{4}))$/
+const hasAllSameDigits = (doc: string) =>
+  new Set(doc.replace(/[^\d]/g, '').split('')).size === 1
 
-// Schema para Etapa 1: Dados pessoais
+const isValidCPF = (cpf: string) => {
+  const cleanCpf = cpf.replace(/[^\d]+/g, '')
+  if (cleanCpf.length !== 11 || hasAllSameDigits(cleanCpf)) return false
+  let sum = 0,
+    remainder
+  for (let i = 1; i <= 9; i++)
+    sum += parseInt(cleanCpf.substring(i - 1, i)) * (11 - i)
+  remainder = (sum * 10) % 11
+  if (remainder === 10 || remainder === 11) remainder = 0
+  if (remainder !== parseInt(cleanCpf.substring(9, 10))) return false
+  sum = 0
+  for (let i = 1; i <= 10; i++)
+    sum += parseInt(cleanCpf.substring(i - 1, i)) * (12 - i)
+  remainder = (sum * 10) % 11
+  if (remainder === 10 || remainder === 11) remainder = 0
+  return remainder === parseInt(cleanCpf.substring(10, 11))
+}
+
+// --- Schemas por Etapa ---
+
+// Etapa 1: Dados pessoais
 export const personalDataSchema = z.object({
   name: z
     .string({ required_error: 'O nome completo é obrigatório.' })
@@ -35,30 +57,48 @@ export const personalDataSchema = z.object({
   }),
 })
 
-// Schema para Etapa 2: Validação SMS
+// Etapa 2: Validação SMS
 export const smsValidationSchema = z.object({
-  smsCode: z
-    .string({ required_error: 'O código SMS é obrigatório.' })
-    .length(6, 'O código SMS deve ter exatamente 6 dígitos.')
-    .regex(/^\d{6}$/, 'O código deve conter apenas números.'),
+  smsCode: z.string().length(6, 'O código deve ter 6 dígitos.'),
 })
 
-// Schema completo do formulário de adesão
-export const adhesionFormSchema = z.object({
-  ...personalDataSchema.shape,
-  ...smsValidationSchema.partial().shape,
+// Etapa 3: Documentos
+const baseDocumentSchema = z.object({
+  documentType: z.enum(['cpf', 'cnpj']),
+  cpf: z.string().optional(),
+  cnpj: z.string().optional(),
 })
 
-// Tipos inferidos dos schemas
+export const documentSchema = baseDocumentSchema.superRefine((data, ctx) => {
+  if (data.documentType === 'cpf') {
+    if (!data.cpf || !isValidCPF(data.cpf)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'CPF inválido.',
+        path: ['cpf'],
+      })
+    }
+  }
+  // Adicionar validação de CNPJ aqui no futuro
+})
+
+// --- Schema Completo e Tipos ---
+
+export const adhesionFormSchema = personalDataSchema
+  .merge(smsValidationSchema.partial())
+  .merge(baseDocumentSchema.partial())
+
+// Tipos inferidos
 export type PersonalDataForm = z.infer<typeof personalDataSchema>
 export type SmsValidationForm = z.infer<typeof smsValidationSchema>
+export type DocumentForm = z.infer<typeof documentSchema>
 export type AdhesionFormSchema = z.infer<typeof adhesionFormSchema>
 
-// Schemas por etapa para validação específica
+// Schemas por etapa
 export const stepSchemas = {
   1: personalDataSchema,
   2: smsValidationSchema,
-  // Etapa 3 será adicionada futuramente
+  3: documentSchema,
 } as const
 
 export type StepNumber = keyof typeof stepSchemas
