@@ -32,7 +32,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
   const { onStepChange, onSubmitSuccess, onSubmitError } = options
   const {
     currentStep,
-    data: formDataFromStore, // Renomeado para clareza
+    data: formDataFromStore,
     isSubmitting,
     errors: storeErrors,
     updateFormData,
@@ -44,7 +44,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
   const navigation = useFormNavigation()
 
   const [resendCooldown, setResendCooldown] = useState(0)
-  const [referralCoupon, setReferralCoupon] = useState<string | null>(null)
 
   const form = useForm<AdhesionFormSchema>({
     resolver: zodResolver(stepSchemas[currentStep as keyof typeof stepSchemas]),
@@ -52,7 +51,8 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     mode: 'onBlur',
   })
 
-  // Sincroniza o estado do formulário (controlado pelo RHF) com o nosso estado global (Zustand)
+  // --- Efeitos de Sincronização com Sistemas Externos ---
+
   useEffect(() => {
     const subscription = form.watch((value) => {
       updateFormData(value as Partial<AdhesionFormData>)
@@ -60,7 +60,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     return () => subscription.unsubscribe()
   }, [form, updateFormData])
 
-  // Efeito para o timer de reenvio do SMS
   useEffect(() => {
     if (resendCooldown > 0) {
       const timer = setTimeout(
@@ -71,7 +70,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     }
   }, [resendCooldown])
 
-  // Efeito para capturar parâmetros de URL na primeira renderização
   useEffect(() => {
     if (
       !formDataFromStore.urlParams ||
@@ -88,23 +86,29 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     }
   }, [formDataFromStore.urlParams, updateFormData])
 
-  // Efeito para notificar sobre a mudança de etapa
   useEffect(() => {
     onStepChange?.(currentStep)
   }, [currentStep, onStepChange])
 
-  // Efeito para gerar o cupom de indicação na Etapa 5
-  useEffect(() => {
-    if (currentStep === 5 && formDataFromStore.contactId && !referralCoupon) {
-      const contactIdNumber = parseInt(formDataFromStore.contactId, 10)
-      if (!isNaN(contactIdNumber)) {
-        const calculatedId = contactIdNumber + 16 + 452
-        const coupon = `10${calculatedId.toString(16)}`.toUpperCase()
-        setReferralCoupon(coupon)
-        updateFormData({ referralCoupon: coupon })
-      }
+  // --- Lógica de Derivação de Estado ---
+
+  let referralCoupon: string | null = null
+  if (currentStep === 5 && formDataFromStore.contactId) {
+    const contactIdNumber = parseInt(formDataFromStore.contactId, 10)
+    if (!isNaN(contactIdNumber)) {
+      const calculatedId = contactIdNumber + 16 + 452
+      referralCoupon = `10${calculatedId.toString(16)}`.toUpperCase()
     }
-  }, [currentStep, formDataFromStore.contactId, referralCoupon, updateFormData])
+  }
+
+  // Sincroniza o cupom derivado com o store, se necessário.
+  useEffect(() => {
+    if (referralCoupon && formDataFromStore.referralCoupon !== referralCoupon) {
+      updateFormData({ referralCoupon })
+    }
+  }, [referralCoupon, formDataFromStore.referralCoupon, updateFormData])
+
+  // --- Funções de Callback e Submissão ---
 
   const handleApiError = (error: any, step: number) => {
     const errorMessage = error.message || 'Ocorreu um erro inesperado.'
@@ -147,12 +151,13 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
 
   const submitStep1 = useCallback(
     async (data: Partial<AdhesionFormData>) => {
+      const currentState = useFormStore.getState().data
       setSubmitting(true)
       clearErrors()
       const [firstname, ...lastnameParts] = data.name!.trim().split(' ')
       const lastname = lastnameParts.join(' ')
-      const attempt = useFormStore.getState().data.attempt || 1
-      const urlParams = useFormStore.getState().data.urlParams || {}
+      const attempt = currentState.attempt || 1
+      const urlParams = currentState.urlParams || {}
       const payload: CreateContactPayload = {
         ...(data as AdhesionFormData),
         firstname,
