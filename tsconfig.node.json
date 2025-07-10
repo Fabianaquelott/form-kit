@@ -14,9 +14,10 @@
 
     /* Linting */
     "strict": true,
+    "types": ["vitest/globals", "@types/node"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.ts"]
+  "include": ["vite.config.ts", "vitest.config.ts", "tsup.config.ts"]
 }
