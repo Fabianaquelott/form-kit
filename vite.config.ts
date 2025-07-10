@@ -1,37 +1,47 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+// vite.config.ts
 
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@/core': resolve(__dirname, 'src/core'),
-      '@/ui': resolve(__dirname, 'src/ui'),
-      '@': resolve(__dirname, 'src'),
-    },
-  },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        additionalData: `@use "@/ui/styles/theme.scss" as *;`,
+import { defineConfig, loadEnv } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+
+  return {
+    plugins: [react()],
+    resolve: {
+      alias: {
+        '@/core': new URL('./src/core', import.meta.url).pathname,
+        '@/ui': new URL('./src/ui', import.meta.url).pathname,
+        '@': new URL('./src', import.meta.url).pathname,
       },
     },
-    modules: {
-      localsConvention: 'camelCase',
-    },
-  },
-  server: {
-    port: 3000,
-    open: true,
-    // ADICIONANDO A CONFIGURAÇÃO DE PROXY
-    proxy: {
-      // Qualquer requisição que comece com '/api' será redirecionada
-      '/api': {
-        target: 'https://mh5qfyjhz1.execute-api.us-east-2.amazonaws.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `@use "@/ui/styles/theme.scss" as *;`,
+        },
+      },
+      modules: {
+        localsConvention: 'camelCase',
       },
     },
-  },
+    server: {
+      port: 3000,
+      open: true,
+      proxy: {
+        // Proxy para a API principal
+        '/main-api': {
+          target: env.VITE_API_BASE_URL,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/main-api/, ''),
+        },
+        // Proxy para a API de ERP (upload)
+        '/erp-api': {
+          target: env.VITE_API_ERP_QA,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/erp-api/, ''),
+        },
+      },
+    },
+  }
 })

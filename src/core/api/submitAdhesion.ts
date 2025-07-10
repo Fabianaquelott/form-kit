@@ -8,12 +8,13 @@ import type {
   AcceptContractPayload,
 } from '../types'
 
-const API_BASE_URL = '/api'
+const API_BASE_URL = '/main-api'
+const API_ERP_BASE_URL = '/erp-api'
 const API_TIMEOUT = 15000
 
-// --- Funções Auxiliares ---
+const UPLOAD_BILL_PATH = '/HubSpot/UploadFotoContaDeLuz'
 
-// Função auxiliar para converter arquivo para Base64
+// --- Funções Auxiliares ---
 const toBase64 = (file: File): Promise<string> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -22,25 +23,25 @@ const toBase64 = (file: File): Promise<string> =>
     reader.onerror = (error) => reject(error)
   })
 
+// Helper para a API Principal.
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT)
+  const fullEndpoint = `${API_BASE_URL}${endpoint}`
 
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(fullEndpoint, {
       ...options,
       signal: controller.signal,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: { 'Content-Type': 'application/json', ...options.headers },
     })
 
     clearTimeout(timeoutId)
-    const responseData = await response.json()
+    const responseText = await response.text()
+    const responseData = responseText ? JSON.parse(responseText) : {}
 
     if (!response.ok) {
       return {
@@ -49,17 +50,52 @@ async function apiRequest<T>(
         ...responseData,
       }
     }
-
-    return {
-      success: true,
-      ...responseData,
-    }
+    return { success: true, ...responseData }
   } catch (error) {
     clearTimeout(timeoutId)
     const errorMessage =
       error instanceof Error
         ? error.name === 'AbortError'
-          ? 'Timeout: A requisição demorou muito para responder.'
+          ? 'Timeout da requisição.'
+          : error.message
+        : 'Ocorreu um erro desconhecido.'
+    return { success: false, error: errorMessage }
+  }
+}
+
+async function apiErpRequest<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<T>> {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT)
+  const fullEndpoint = `${API_ERP_BASE_URL}${endpoint}`
+
+  try {
+    const response = await fetch(fullEndpoint, {
+      ...options,
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json', ...options.headers },
+    })
+
+    clearTimeout(timeoutId)
+    const responseText = await response.text()
+    const responseData = responseText ? JSON.parse(responseText) : {}
+
+    if (!response.ok) {
+      return {
+        success: false,
+        error: responseData.message || `HTTP Error ${response.status}`,
+        ...responseData,
+      }
+    }
+    return { success: true, ...responseData }
+  } catch (error) {
+    clearTimeout(timeoutId)
+    const errorMessage =
+      error instanceof Error
+        ? error.name === 'AbortError'
+          ? 'Timeout da requisição.'
           : error.message
         : 'Ocorreu um erro desconhecido.'
     return { success: false, error: errorMessage }
@@ -77,7 +113,6 @@ async function processNewUser(
   if (!createContactResponse.success || !createContactResponse.contact_id) {
     return createContactResponse
   }
-
   const contactId = createContactResponse.contact_id
 
   const dealPayload = {
@@ -109,7 +144,6 @@ async function processNewUser(
   if (!sendSmsResponse.success) {
     throw new Error(sendSmsResponse.error || 'Falha ao enviar o código SMS.')
   }
-
   return { ...createContactResponse, deal: createDealResponse }
 }
 
@@ -124,10 +158,10 @@ export async function handleStep1Submission(
 export async function getUserByEmail(
   email: string
 ): Promise<ApiResponse<Contact>> {
-  const endpoint = `/get-contact-info?email=${encodeURIComponent(email)}`
-  return apiRequest<Contact>(endpoint, {
-    method: 'GET',
-  })
+  return apiRequest<Contact>(
+    `/get-contact-info?email=${encodeURIComponent(email)}`,
+    { method: 'GET' }
+  )
 }
 
 export async function validateSms(payload: {
@@ -168,14 +202,11 @@ export async function submitDocuments(payload: {
       contact_id: payload.contactId,
       cpf: payload.document.value,
     }
-    const updateCpfResponse = await apiRequest(`/v2/update-contact-cpf`, {
+    const updateCpfResponse = await apiRequest('/v2/update-contact-cpf', {
       method: 'PATCH',
       body: JSON.stringify(updateCpfPayload),
     })
-
-    if (!updateCpfResponse.success) {
-      return updateCpfResponse
-    }
+    if (!updateCpfResponse.success) return updateCpfResponse
   }
 
   const updateDealPayload: Partial<Deal> = {
@@ -186,41 +217,36 @@ export async function submitDocuments(payload: {
     natureza_juridica:
       payload.document.type === 'cpf' ? 'Pessoa Física' : 'Pessoa Jurídica',
   }
-
-  const updateDealResponse = await apiRequest('/v2/update-deal', {
+  return await apiRequest('/v2/update-deal', {
     method: 'PATCH',
     body: JSON.stringify(updateDealPayload),
   })
-
-  return updateDealResponse
 }
 
 export async function uploadBillFile(payload: {
   dealId: string
   file: File
 }): Promise<ApiResponse<any>> {
-  const formData = new FormData()
-  formData.append('hubSpotNegocioId', payload.dealId)
   try {
     const base64String = await toBase64(payload.file)
-    formData.append('faturaCemigBase64', base64String)
-    formData.append('extensaoArquivo', payload.file.name.split('.').pop() || '')
 
-    const response = await fetch(`${API_BASE_URL}/v2/upload-fatura`, {
-      // Endpoint hipotético
-      method: 'POST',
-      body: formData,
-    })
-
-    if (!response.ok) {
-      const errorData = await response
-        .json()
-        .catch(() => ({ message: 'Erro no servidor' }))
-      return { success: false, error: errorData.message || 'Erro no upload' }
+    const uploadPayload = {
+      hubSpotNegocioId: payload.dealId,
+      payload: {
+        faturaCemigBase64: base64String,
+        extensaoArquivo: payload.file.name.split('.').pop() || '',
+      },
     }
-    return { success: true, data: await response.json() }
+
+    return apiErpRequest<any>(UPLOAD_BILL_PATH, {
+      method: 'POST',
+      body: JSON.stringify(uploadPayload),
+    })
   } catch (error: any) {
-    return { success: false, error: error.message }
+    return {
+      success: false,
+      error: 'Falha ao processar o arquivo para upload.',
+    }
   }
 }
 
