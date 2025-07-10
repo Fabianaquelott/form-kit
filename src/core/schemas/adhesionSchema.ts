@@ -29,7 +29,7 @@ const isValidCPF = (cpf: string) => {
 
 // --- Schemas por Etapa ---
 
-export const personalDataSchema = z.object({
+const basePersonalDataSchema = z.object({
   name: z
     .string({ required_error: 'O nome completo é obrigatório.' })
     .min(3, { message: 'O nome completo deve ter no mínimo 3 caracteres.' })
@@ -54,7 +54,21 @@ export const personalDataSchema = z.object({
   termsAccepted: z.boolean().refine((val) => val === true, {
     message: 'Você precisa aceitar os termos para continuar.',
   }),
+  isEmailConfirmationRequired: z.boolean().optional(),
+  emailConfirmed: z.boolean().optional(),
 })
+
+export const personalDataSchema = basePersonalDataSchema.superRefine(
+  (data, ctx) => {
+    if (data.isEmailConfirmationRequired && !data.emailConfirmed) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Por favor, confirme que seu e-mail está correto.',
+        path: ['emailConfirmed'],
+      })
+    }
+  }
+)
 
 export const smsValidationSchema = z.object({
   smsCode: z.string().length(6, 'O código deve ter 6 dígitos.'),
@@ -62,18 +76,58 @@ export const smsValidationSchema = z.object({
 
 const baseDocumentSchema = z.object({
   documentType: z.enum(['cpf', 'cnpj']),
-  cpf: z.string().optional(),
+  myCpf: z.string().optional(),
+  isBillOwner: z.boolean().optional(),
+  billOwnerCpf: z.string().optional(),
+  dontKnowBillOwnerCpf: z.boolean().optional(),
+  billFile: z.instanceof(FileList).nullable().optional(),
   cnpj: z.string().optional(),
 })
 
 export const documentSchema = baseDocumentSchema.superRefine((data, ctx) => {
-  if (data.documentType === 'cpf') {
-    if (!data.cpf || !isValidCPF(data.cpf)) {
+  if (data.documentType === 'cnpj') {
+    if (!data.cnpj /* || !isValidCNPJ(data.cnpj) */) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: 'CPF inválido.',
-        path: ['cpf'],
+        message: 'CNPJ inválido.',
+        path: ['cnpj'],
       })
+    }
+  }
+
+  if (data.documentType === 'cpf') {
+    if (typeof data.isBillOwner !== 'boolean') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Selecione uma opção.',
+        path: ['isBillOwner'],
+      })
+    } else if (data.isBillOwner === true) {
+      if (!data.myCpf || !isValidCPF(data.myCpf)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Seu CPF é inválido.',
+          path: ['myCpf'],
+        })
+      }
+    } else if (data.isBillOwner === false) {
+      if (data.dontKnowBillOwnerCpf) {
+        if (!data.billFile || data.billFile.length === 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'O envio da conta de luz é obrigatório.',
+            path: ['billFile'],
+          })
+        }
+      } else {
+        if (!data.billOwnerCpf || !isValidCPF(data.billOwnerCpf)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'CPF do titular inválido.',
+            path: ['billOwnerCpf'],
+          })
+        }
+      }
     }
   }
 })
@@ -90,7 +144,7 @@ export const contractSchema = z.object({
 
 // --- Schema Completo e Tipos ---
 
-export const adhesionFormSchema = personalDataSchema
+export const adhesionFormSchema = basePersonalDataSchema
   .merge(smsValidationSchema.partial())
   .merge(baseDocumentSchema.partial())
   .merge(contractSchema.partial())

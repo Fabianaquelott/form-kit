@@ -19,15 +19,17 @@ type FormStore = AdhesionFormState & FormStoreActions
 
 const initialState: AdhesionFormState = {
   currentStep: 1,
-  totalSteps: 5, // ATUALIZADO
-  data: {},
+  totalSteps: 5,
+  data: {
+    isEmailConfirmationRequired: false,
+  },
   isSubmitting: false,
   errors: {},
 }
 
 export const useFormStore = create<FormStore>()(
   devtools(
-    (set, get) => ({
+    (set) => ({
       ...initialState,
 
       setCurrentStep: (step: number) =>

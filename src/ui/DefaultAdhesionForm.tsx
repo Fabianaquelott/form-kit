@@ -39,6 +39,9 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
     referralCoupon,
   } = formMethods
 
+  const { register, watch } = formMethods.form;
+  const isEmailConfirmationRequired = watch('isEmailConfirmationRequired');
+
   const renderStep1 = () => (
     <div className={styles.step}>
       <div className={styles.stepHeader}>
@@ -48,11 +51,22 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
         </p>
       </div>
       <div className={styles.stepContent}>
-        <Input {...formMethods.form.register('name')} label="Nome completo" errorMessage={errors.name?.message} required fullWidth />
-        <Input {...formMethods.form.register('email')} type="email" label="E-mail" errorMessage={errors.email?.message} required fullWidth />
-        <Input {...formMethods.form.register('phone')} type="tel" label="Telefone" errorMessage={errors.phone?.message} required fullWidth />
+        <Input {...register('name')} label="Nome completo" errorMessage={errors.name?.message} required fullWidth />
+        <Input {...register('email')} type="email" label="E-mail" errorMessage={errors.email?.message} required fullWidth />
+        <Input {...register('phone')} type="tel" label="Telefone" errorMessage={errors.phone?.message} required fullWidth />
+
+        {isEmailConfirmationRequired && (
+          <div className={`${styles.checkboxContainer} ${styles.warningBox}`}>
+            <input {...register('emailConfirmed')} type="checkbox" id="emailConfirmed" className={styles.checkbox} />
+            <Label htmlFor="emailConfirmed" className={styles.checkboxLabel}>
+              Meu e-mail está correto.
+            </Label>
+            {errors.emailConfirmed && <div className={styles.errorMessage}>{errors.emailConfirmed.message as string}</div>}
+          </div>
+        )}
+
         <div className={styles.checkboxContainer}>
-          <input {...formMethods.form.register('termsAccepted')} type="checkbox" id="terms" className={styles.checkbox} />
+          <input {...register('termsAccepted')} type="checkbox" id="terms" className={styles.checkbox} />
           <Label htmlFor="terms" className={styles.checkboxLabel}>
             Li e concordo com os <a href="#" className={styles.link}>termos e condições</a>.
           </Label>
@@ -72,7 +86,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
       </div>
       <div className={styles.stepContent}>
         <Input
-          {...formMethods.form.register('smsCode')}
+          {...register('smsCode')}
           label="Código SMS"
           maxLength={6}
           errorMessage={errors.smsCode?.message || (currentStep === 2 ? errors.general : '')}
@@ -133,7 +147,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
                   </Button>
                 )}
                 <Button type="submit" isLoading={isSubmitting} disabled={isSubmitting}>
-                  {navigation.isLastStep ? 'Finalizar' : 'Continuar'}
+                  {navigation.isLastStep ? 'Finalizar' : 'Concluir'}
                 </Button>
               </div>
             )}

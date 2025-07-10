@@ -45,6 +45,8 @@ export interface AdhesionFormData {
   email: string
   phone: string
   termsAccepted: boolean
+  isEmailConfirmationRequired?: boolean
+  emailConfirmed?: boolean
   contactId?: string
   dealId?: string
   urlParams?: UrlParams
@@ -56,7 +58,11 @@ export interface AdhesionFormData {
 
   // Etapa 3
   documentType?: 'cpf' | 'cnpj'
-  cpf?: string
+  myCpf?: string
+  isBillOwner?: boolean
+  billOwnerCpf?: string
+  dontKnowBillOwnerCpf?: boolean
+  billFile?: FileList | null
   cnpj?: string
 
   // Etapa 4
@@ -64,7 +70,7 @@ export interface AdhesionFormData {
   termsAcceptedStep4?: boolean
 
   // Etapa 5
-  referralCoupon?: string // <<< PROPRIEDADE ADICIONADA
+  referralCoupon?: string
 }
 
 export interface CreateContactPayload extends Partial<AdhesionFormData> {
@@ -104,6 +110,7 @@ export interface ApiResponse<T = any> {
   data?: T
   error?: string
   message?: string
+  info?: string
   code?: string
   contact_id?: string
   contact?: Contact

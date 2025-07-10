@@ -12,6 +12,7 @@ import {
   getUserByEmail,
   resendSms,
   submitDocuments,
+  uploadBillFile,
   acceptContract,
 } from './api/submitAdhesion'
 import type {
@@ -54,8 +55,8 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
   // --- Efeitos de Sincronização com Sistemas Externos ---
 
   useEffect(() => {
-    const subscription = form.watch((value) => {
-      updateFormData(value as Partial<AdhesionFormData>)
+    const subscription = form.watch((value: Partial<AdhesionFormData>) => {
+      updateFormData(value)
     })
     return () => subscription.unsubscribe()
   }, [form, updateFormData])
@@ -101,7 +102,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     }
   }
 
-  // Sincroniza o cupom derivado com o store, se necessário.
   useEffect(() => {
     if (referralCoupon && formDataFromStore.referralCoupon !== referralCoupon) {
       updateFormData({ referralCoupon })
@@ -154,6 +154,14 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       const currentState = useFormStore.getState().data
       setSubmitting(true)
       clearErrors()
+
+      if (currentState.isEmailConfirmationRequired) {
+        updateFormData({
+          isEmailConfirmationRequired: false,
+          emailConfirmed: false,
+        })
+      }
+
       const [firstname, ...lastnameParts] = data.name!.trim().split(' ')
       const lastname = lastnameParts.join(' ')
       const attempt = currentState.attempt || 1
@@ -173,15 +181,25 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
             ...data,
             contactId: result.contact_id,
             dealId: result.deal?.deal_id,
+            attempt: 1,
           })
           navigation.nextStep()
         } else {
           if (result.code === 'user_already_exist') {
             await handleExistingUser(data.email!)
+          } else if (
+            result.code === 'confirm_email' ||
+            result.code === 'did_you_mean_email'
+          ) {
+            updateFormData({
+              isEmailConfirmationRequired: true,
+              attempt: attempt + 1,
+            })
+            const errorMessage =
+              result.info || 'Confirme se seu e-mail está correto.'
+            setErrors({ email: errorMessage })
+            onSubmitError?.(errorMessage)
           } else {
-            if (result.code === 'did_you_mean_email') {
-              updateFormData({ attempt: attempt + 1 })
-            }
             setErrors({
               general:
                 result.error || 'Não foi possível processar sua solicitação.',
@@ -246,20 +264,54 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
   const submitStep3 = useCallback(
     async (data: Partial<AdhesionFormData>) => {
       const currentState = useFormStore.getState().data
-      const documentValue = data.documentType === 'cpf' ? data.cpf : data.cnpj
-      if (
-        !currentState.contactId ||
-        !currentState.dealId ||
-        !currentState.name ||
-        !data.documentType ||
-        !documentValue
-      ) {
-        setErrors({ general: 'Dados insuficientes para enviar o documento.' })
-        return
-      }
       setSubmitting(true)
       clearErrors()
+
       try {
+        if (
+          data.documentType === 'cpf' &&
+          data.isBillOwner === false &&
+          data.dontKnowBillOwnerCpf
+        ) {
+          if (!currentState.dealId) {
+            setErrors({
+              general: 'ID do Negócio não encontrado para o upload.',
+            })
+          } else if (data.billFile?.[0]) {
+            const uploadResult = await uploadBillFile({
+              dealId: currentState.dealId,
+              file: data.billFile[0],
+            })
+            if (uploadResult.success) {
+              updateFormData(data)
+              navigation.nextStep()
+            } else {
+              setErrors({
+                general: uploadResult.error || 'Falha no upload do arquivo.',
+              })
+            }
+          }
+          return
+        }
+
+        const documentValue =
+          data.documentType === 'cpf'
+            ? data.isBillOwner
+              ? data.myCpf
+              : data.billOwnerCpf
+            : data.cnpj
+
+        if (
+          !currentState.contactId ||
+          !currentState.dealId ||
+          !currentState.name ||
+          !data.documentType ||
+          !documentValue
+        ) {
+          setErrors({ general: 'Dados insuficientes para enviar o documento.' })
+          return
+        }
+
         const payload = {
           contactId: currentState.contactId,
           dealId: currentState.dealId,
@@ -267,6 +319,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
           document: { type: data.documentType, value: documentValue },
         }
         const result = await submitDocuments(payload)
+
         if (result.success) {
           updateFormData(data)
           navigation.nextStep()

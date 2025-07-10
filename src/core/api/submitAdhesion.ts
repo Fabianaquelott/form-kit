@@ -11,6 +11,17 @@ import type {
 const API_BASE_URL = '/api'
 const API_TIMEOUT = 15000
 
+// --- Funções Auxiliares ---
+
+// Função auxiliar para converter arquivo para Base64
+const toBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve((reader.result as string).split(',')[1])
+    reader.onerror = (error) => reject(error)
+  })
+
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -182,6 +193,35 @@ export async function submitDocuments(payload: {
   })
 
   return updateDealResponse
+}
+
+export async function uploadBillFile(payload: {
+  dealId: string
+  file: File
+}): Promise<ApiResponse<any>> {
+  const formData = new FormData()
+  formData.append('hubSpotNegocioId', payload.dealId)
+  try {
+    const base64String = await toBase64(payload.file)
+    formData.append('faturaCemigBase64', base64String)
+    formData.append('extensaoArquivo', payload.file.name.split('.').pop() || '')
+
+    const response = await fetch(`${API_BASE_URL}/v2/upload-fatura`, {
+      // Endpoint hipotético
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: 'Erro no servidor' }))
+      return { success: false, error: errorData.message || 'Erro no upload' }
+    }
+    return { success: true, data: await response.json() }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
 }
 
 export async function acceptContract(
