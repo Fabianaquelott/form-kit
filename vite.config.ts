@@ -2,6 +2,7 @@
 
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path' // 1. Importar o módulo 'path'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
@@ -9,10 +10,11 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     resolve: {
+      // 2. CORREÇÃO: Usando path.resolve com __dirname para garantir caminhos absolutos
       alias: {
-        '@/core': new URL('./src/core', import.meta.url).pathname,
-        '@/ui': new URL('./src/ui', import.meta.url).pathname,
-        '@': new URL('./src', import.meta.url).pathname,
+        '@/core': path.resolve(__dirname, './src/core'),
+        '@/ui': path.resolve(__dirname, './src/ui'),
+        '@': path.resolve(__dirname, './src'),
       },
     },
     css: {
@@ -29,13 +31,11 @@ export default defineConfig(({ mode }) => {
       port: 3000,
       open: true,
       proxy: {
-        // Proxy para a API principal
         '/main-api': {
           target: env.VITE_API_BASE_URL,
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/main-api/, ''),
         },
-        // Proxy para a API de ERP (upload)
         '/erp-api': {
           target: env.VITE_API_ERP_QA,
           changeOrigin: true,
