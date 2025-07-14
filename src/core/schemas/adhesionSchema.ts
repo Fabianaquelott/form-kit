@@ -4,8 +4,10 @@ import { z } from 'zod'
 
 // --- Funções Utilitárias de Validação ---
 const NAME_REGEX = /^[a-zA-Z\u00C0-\u017F´`~^. ]+$/
-const BRAZILIAN_PHONE_REGEX =
-  /^(?:\(?([0-9]{2})\)?\s?)?(?:((?:9\d|[2-9])\d{3})-?(\d{4}))$/
+
+// Regex ajustada para validar apenas celulares com 9 dígitos (iniciando com 9).
+const BRAZILIAN_PHONE_REGEX = /^(?:\(?([0-9]{2})\)?\s?)?(?:(9\d{4})-?(\d{4}))$/
+
 const hasAllSameDigits = (doc: string) =>
   new Set(doc.replace(/[^\d]/g, '').split('')).size === 1
 
@@ -49,7 +51,7 @@ const basePersonalDataSchema = z.object({
     .string({ required_error: 'O telefone é obrigatório.' })
     .min(10, { message: 'O telefone deve ter no mínimo 10 dígitos.' })
     .refine((phone) => BRAZILIAN_PHONE_REGEX.test(phone), {
-      message: 'Formato de telefone inválido. Use (XX) XXXXX-XXXX.',
+      message: 'Formato de celular inválido. Use (XX) 9XXXX-XXXX.',
     }),
   termsAccepted: z.boolean().refine((val) => val === true, {
     message: 'Você precisa aceitar os termos para continuar.',
@@ -94,7 +96,6 @@ export const documentSchema = baseDocumentSchema.superRefine((data, ctx) => {
       })
     }
   }
-
   if (data.documentType === 'cpf') {
     if (typeof data.isBillOwner !== 'boolean') {
       ctx.addIssue({

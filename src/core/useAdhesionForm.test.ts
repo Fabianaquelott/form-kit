@@ -6,10 +6,8 @@ import { useFormStore } from './state/formStore'
 import { useAdhesionForm } from './useAdhesionForm'
 import * as api from './api/submitAdhesion'
 
-// Mock do módulo de API para controlar as respostas em todos os testes
 vi.mock('./api/submitAdhesion')
 
-// --- DADOS DE TESTE ---
 const NEW_USER_DATA = {
   name: 'Novo Usuário Teste Completo',
   email: 'completo@teste.com',
@@ -39,6 +37,13 @@ const INVALID_FORM_DATA = {
   termsAccepted: false,
 }
 
+const LANDLINE_USER_DATA = {
+  name: 'Usuário Telefone Fixo',
+  email: 'fixo@teste.com',
+  phone: '(31) 3222-4444',
+  termsAccepted: true,
+}
+
 describe('useAdhesionForm Hook', () => {
   beforeEach(() => {
     act(() => {
@@ -47,9 +52,8 @@ describe('useAdhesionForm Hook', () => {
     vi.clearAllMocks()
   })
 
-  // --- TESTE DE FLUXO PRINCIPAL ---
+  // --- Teste de Fluxo Principal ---
   it('deve navegar com sucesso por todas as 5 etapas para um novo usuário', async () => {
-    // Arrange
     vi.mocked(api.handleStep1Submission).mockResolvedValue({
       success: true,
       contact_id: '12345',
@@ -64,16 +68,12 @@ describe('useAdhesionForm Hook', () => {
 
     const { result } = renderHook(() => useAdhesionForm())
 
-    // Act & Assert (Etapa por Etapa)
-
-    // ETAPA 1: Dados Pessoais
     await act(async () => {
       result.current.form.reset(NEW_USER_DATA)
       await result.current.onSubmit()
     })
     await waitFor(() => expect(result.current.currentStep).toBe(2))
 
-    // ETAPA 2: SMS
     await act(async () => {
       result.current.form.reset({
         ...useFormStore.getState().data,
@@ -83,7 +83,6 @@ describe('useAdhesionForm Hook', () => {
     })
     await waitFor(() => expect(result.current.currentStep).toBe(3))
 
-    // ETAPA 3: Documento
     await act(async () => {
       result.current.form.reset({
         ...useFormStore.getState().data,
@@ -93,7 +92,6 @@ describe('useAdhesionForm Hook', () => {
     })
     await waitFor(() => expect(result.current.currentStep).toBe(4))
 
-    // ETAPA 4: Contrato
     await act(async () => {
       result.current.form.reset({
         ...useFormStore.getState().data,
@@ -103,24 +101,39 @@ describe('useAdhesionForm Hook', () => {
     })
     await waitFor(() => expect(result.current.currentStep).toBe(5))
 
-    // Verificação Final na Etapa 5
     await waitFor(() => {
       expect(result.current.referralCoupon).not.toBeNull()
       expect(result.current.referralCoupon).toContain('10')
     })
   })
 
-  // --- TESTES DE CENÁRIOS DE ERRO E ISOLADOS ---
-
+  // --- Testes de Cenários de Erro e Validação ---
   it('não deve chamar a API se a validação do formulário falhar', async () => {
     const { result } = renderHook(() => useAdhesionForm())
+
     await act(async () => {
       result.current.form.reset(INVALID_FORM_DATA)
       await result.current.onSubmit()
     })
+
     expect(api.handleStep1Submission).not.toHaveBeenCalled()
     expect(result.current.currentStep).toBe(1)
     expect(result.current.errors.name?.message).toBeDefined()
+  })
+
+  it('deve rejeitar um número de telefone fixo e mostrar erro', async () => {
+    const { result } = renderHook(() => useAdhesionForm())
+
+    await act(async () => {
+      result.current.form.reset(LANDLINE_USER_DATA)
+      await result.current.onSubmit()
+    })
+
+    expect(api.handleStep1Submission).not.toHaveBeenCalled()
+    expect(result.current.currentStep).toBe(1)
+    expect(result.current.errors.phone?.message).toContain(
+      'Formato de celular inválido'
+    )
   })
 
   it('deve lidar com falha na API na Etapa 1', async () => {
@@ -128,10 +141,12 @@ describe('useAdhesionForm Hook', () => {
       new Error('Falha no servidor')
     )
     const { result } = renderHook(() => useAdhesionForm())
+
     await act(async () => {
       result.current.form.reset(NEW_USER_DATA)
       await result.current.onSubmit()
     })
+
     await waitFor(() => {
       expect(result.current.currentStep).toBe(1)
       expect(result.current.errors.general).toBe('Falha no servidor')
@@ -166,35 +181,28 @@ describe('useAdhesionForm Hook', () => {
     })
   })
 
-  // --- TESTES DE FLUXOS DE USUÁRIO EXISTENTE ---
-
+  // --- Testes de Fluxos de Usuário Existente ---
   describe('Fluxo de Usuário Existente', () => {
-    it('deve navegar para a Etapa 3 (documentos) se o deal estiver incompleto', async () => {
+    it('deve navegar para a Etapa 3 se o deal estiver incompleto', async () => {
       vi.mocked(api.handleStep1Submission).mockResolvedValue({
         success: false,
         code: 'user_already_exist',
       })
       vi.mocked(api.getUserByEmail).mockResolvedValue({
         success: true,
-        contact: {
-          id: 'e-id-1',
-          firstname: 'Usuário',
-          lastname: 'Antigo',
-          email: EXISTING_USER_DATA.email,
-          aceite_do_termo_de_adesao: 'false',
-          validacao_do_numero: 'true',
-          deal: { id: 'd-id-1', cpf: null },
-        },
+        contact: { id: 'e-id-1', deal: { id: 'd-id-1', cpf: null } },
       })
       const { result } = renderHook(() => useAdhesionForm())
+
       await act(async () => {
         result.current.form.reset(EXISTING_USER_DATA)
         await result.current.onSubmit()
       })
+
       await waitFor(() => expect(result.current.currentStep).toBe(3))
     })
 
-    it('deve navegar para a Etapa 4 (contrato) se o deal estiver completo mas o termo não foi aceito', async () => {
+    it('deve navegar para a Etapa 4 se o deal estiver completo mas o termo não foi aceito', async () => {
       vi.mocked(api.handleStep1Submission).mockResolvedValue({
         success: false,
         code: 'user_already_exist',
@@ -203,21 +211,21 @@ describe('useAdhesionForm Hook', () => {
         success: true,
         contact: {
           id: 'e-id-2',
-          firstname: 'Usuário',
-          lastname: 'QuaseLá',
           deal: { id: 'd-id-2', cpf: '11122233344' },
           aceite_do_termo_de_adesao: 'false',
         },
       })
       const { result } = renderHook(() => useAdhesionForm())
+
       await act(async () => {
         result.current.form.reset(EXISTING_USER_DATA)
         await result.current.onSubmit()
       })
+
       await waitFor(() => expect(result.current.currentStep).toBe(4))
     })
 
-    it('deve navegar para a Etapa 5 (conclusão) se o usuário já completou todo o fluxo', async () => {
+    it('deve navegar para a Etapa 5 se o usuário já completou todo o fluxo', async () => {
       vi.mocked(api.handleStep1Submission).mockResolvedValue({
         success: false,
         code: 'user_already_exist',
@@ -226,23 +234,22 @@ describe('useAdhesionForm Hook', () => {
         success: true,
         contact: {
           id: 'e-id-3',
-          firstname: 'Usuário',
-          lastname: 'Completo',
           deal: { id: 'd-id-3', cpf: '11122233344' },
           aceite_do_termo_de_adesao: 'true',
         },
       })
       const { result } = renderHook(() => useAdhesionForm())
+
       await act(async () => {
         result.current.form.reset(EXISTING_USER_DATA)
         await result.current.onSubmit()
       })
+
       await waitFor(() => expect(result.current.currentStep).toBe(5))
     })
   })
 
-  // --- TESTES DE FUNCIONALIDADES ESPECÍFICAS ---
-
+  // --- Testes de Funcionalidades Específicas ---
   describe('Funcionalidades Específicas', () => {
     it('deve lidar com o reenvio de SMS e ativar o cooldown', async () => {
       act(() => {
