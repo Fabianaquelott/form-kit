@@ -14,10 +14,10 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, './src'),
       },
     },
-    // CORREÇÃO: Removida a configuração 'preprocessorOptions' do SASS.
     css: {
       modules: {
         localsConvention: 'camelCase',
+        generateScopedName: '[name]__[local]___[hash:base64:5]',
       },
     },
     server: {

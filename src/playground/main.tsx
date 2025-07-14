@@ -2,8 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
+// Importar os estilos globais primeiro
+import '../ui/styles/theme.css';
+import './App.css';
+
 async function enableMocking() {
-  // Execute o mock apenas em ambiente de desenvolvimento
   if (import.meta.env.MODE !== 'development') {
     return;
   }
