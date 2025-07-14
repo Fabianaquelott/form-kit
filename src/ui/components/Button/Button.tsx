@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import styles from './Button.module.scss'
+import styles from './Button.module.css'
 
 const buttonVariants = cva(styles.button, {
   variants: {
@@ -29,7 +29,7 @@ const buttonVariants = cva(styles.button, {
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  VariantProps<typeof buttonVariants> {
   isLoading?: boolean
   leftIcon?: React.ReactNode
   rightIcon?: React.ReactNode
@@ -66,17 +66,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             <div className={styles.spinnerIcon} />
           </div>
         )}
-        
+
         {!isLoading && leftIcon && (
           <span className={styles.leftIcon} aria-hidden="true">
             {leftIcon}
           </span>
         )}
-        
+
         <span className={isLoading ? styles.loadingText : ''}>
           {children}
         </span>
-        
+
         {!isLoading && rightIcon && (
           <span className={styles.rightIcon} aria-hidden="true">
             {rightIcon}

@@ -1,3 +1,6 @@
+/* Importa as variáveis globais de cores, espaçamento, etc. */
+@import '../../styles/theme.css';
+
 .container {
   display: flex;
   flex-direction: column;
@@ -29,20 +32,51 @@
 }
 
 .input {
-  @include input-base;
+  /* Estilos do antigo mixin 'input-base' aplicados diretamente */
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-gray-300);
+  background-color: var(--color-white);
+  font-size: var(--text-base);
+  transition: all var(--transition-fast);
+  
+  /* Estilos específicos do input */
   font-family: var(--font-sans);
-  
-  // Adjust padding when icons are present
-  &:not(:first-child) {
-    padding-left: 2.5rem;
-  }
-  
-  &:not(:last-child) {
-    padding-right: 2.5rem;
-  }
 }
 
-// Tamanhos
+/* Ajusta o padding quando há ícones */
+.input:not(:first-child) {
+  padding-left: 2.5rem;
+}
+
+.input:not(:last-child) {
+  padding-right: 2.5rem;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgb(14 165 233 / 0.1);
+}
+
+.input:disabled {
+  background-color: var(--color-gray-50);
+  color: var(--color-gray-500);
+  cursor: not-allowed;
+  border-color: var(--color-gray-200);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--color-error-500);
+}
+
+.input[aria-invalid='true']:focus {
+  border-color: var(--color-error-500);
+  box-shadow: 0 0 0 3px rgb(239 68 68 / 0.1);
+}
+
+/* Tamanhos */
 .sm {
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
@@ -61,26 +95,26 @@
   min-height: 3rem;
 }
 
-// Estados
+/* Estados (aplicados diretamente pela lógica de CVA no componente) */
 .error {
   border-color: var(--color-error-500);
-  
-  &:focus {
-    border-color: var(--color-error-500);
-    box-shadow: 0 0 0 3px rgb(239 68 68 / 0.1);
-  }
+}
+
+.error:focus {
+  border-color: var(--color-error-500);
+  box-shadow: 0 0 0 3px rgb(239 68 68 / 0.1);
 }
 
 .success {
   border-color: var(--color-success-500);
-  
-  &:focus {
-    border-color: var(--color-success-500);
-    box-shadow: 0 0 0 3px rgb(34 197 94 / 0.1);
-  }
 }
 
-// Ícones
+.success:focus {
+  border-color: var(--color-success-500);
+  box-shadow: 0 0 0 3px rgb(34 197 94 / 0.1);
+}
+
+/* Ícones */
 .leftIcon,
 .rightIcon {
   position: absolute;
@@ -101,7 +135,7 @@
   right: var(--space-3);
 }
 
-// Mensagens
+/* Mensagens */
 .helperText {
   font-size: var(--text-xs);
   color: var(--color-gray-500);
@@ -115,27 +149,19 @@
   display: flex;
   align-items: center;
   gap: var(--space-1);
-  
-  &::before {
-    content: '⚠';
-    font-size: var(--text-sm);
-  }
 }
 
-// Placeholder styling
+.errorMessage::before {
+  content: '⚠';
+  font-size: var(--text-sm);
+}
+
+/* Placeholder */
 .input::placeholder {
   color: var(--color-gray-400);
 }
 
-// Disabled state
-.input:disabled {
-  background-color: var(--color-gray-50);
-  color: var(--color-gray-500);
-  cursor: not-allowed;
-  border-color: var(--color-gray-200);
-}
-
-// Focus within container
+/* Focus dentro do container */
 .container:focus-within .label {
   color: var(--color-primary-600);
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { DefaultAdhesionForm } from '../ui/DefaultAdhesionForm'
-import './App.scss'
+import './App.css'
 
 function App() {
   const handleSuccess = (data: any) => {
@@ -19,7 +19,7 @@ function App() {
         <h1>Adhesion Form Lib - Playground</h1>
         <p>Ambiente de desenvolvimento para testar a biblioteca</p>
       </div>
-      
+
       <DefaultAdhesionForm
         onSuccess={handleSuccess}
         onError={handleError}

@@ -1,3 +1,5 @@
+/* src/ui/components/Label/Label.module.css */
+
 .label {
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
@@ -9,10 +11,10 @@
   cursor: pointer;
   transition: color var(--transition-fast);
   line-height: var(--leading-normal);
-  
-  &:hover {
-    color: var(--color-primary-600);
-  }
+}
+
+.label:hover {
+  color: var(--color-primary-600);
 }
 
 .required {
@@ -21,27 +23,27 @@
   font-weight: var(--font-bold);
 }
 
-// Estados especiais
-.label[aria-disabled="true"] {
+/* Estados especiais */
+.label[aria-disabled='true'] {
   color: var(--color-gray-400);
   cursor: not-allowed;
-  
-  &:hover {
-    color: var(--color-gray-400);
-  }
 }
 
-// Focus styling quando usado com inputs
+.label[aria-disabled='true']:hover {
+  color: var(--color-gray-400);
+}
+
+/* Focus styling quando usado com inputs */
 .label:has(+ input:focus),
-.label:has(+ [role="textbox"]:focus) {
+.label:has(+ [role='textbox']:focus) {
   color: var(--color-primary-600);
 }
 
-// Error state
-.label:has(+ [aria-invalid="true"]) {
+/* Error state */
+.label:has(+ [aria-invalid='true']) {
   color: var(--color-error-600);
-  
-  &:hover {
-    color: var(--color-error-700);
-  }
+}
+
+.label:has(+ [aria-invalid='true']):hover {
+  color: var(--color-error-700);
 }

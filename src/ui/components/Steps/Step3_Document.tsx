@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import { Input } from '../Input/Input';
 import { Button } from '../Button/Button';
 import { Label } from '../Label/Label';
-import styles from './Steps.module.scss';
+import styles from './Steps.module.css';
 
 const Step3_Document: React.FC = () => {
   const { register, watch, setValue, formState: { errors } } = useFormContext();

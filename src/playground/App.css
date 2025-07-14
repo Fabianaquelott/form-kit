@@ -1,3 +1,5 @@
+/* playground/App.css */
+
 .app {
   min-height: 100vh;
   font-family: var(--font-sans);
@@ -9,23 +11,23 @@
   padding: var(--space-8);
   text-align: center;
   box-shadow: var(--shadow-md);
-  
-  h1 {
-    font-size: var(--text-3xl);
-    font-weight: var(--font-bold);
-    margin: 0 0 var(--space-2) 0;
-    line-height: var(--leading-tight);
-  }
-  
-  p {
-    font-size: var(--text-lg);
-    opacity: 0.9;
-    margin: 0;
-    line-height: var(--leading-normal);
-  }
 }
 
-// Global styles reset
+.header h1 {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  margin: 0 0 var(--space-2) 0;
+  line-height: var(--leading-tight);
+}
+
+.header p {
+  font-size: var(--text-lg);
+  opacity: 0.9;
+  margin: 0;
+  line-height: var(--leading-normal);
+}
+
+/* Global styles reset */
 * {
   box-sizing: border-box;
 }
@@ -38,17 +40,15 @@ body {
   line-height: var(--leading-normal);
 }
 
-// Responsive
+/* Responsive */
 @media (max-width: 640px) {
   .header {
     padding: var(--space-6);
-    
-    h1 {
-      font-size: var(--text-2xl);
-    }
-    
-    p {
-      font-size: var(--text-base);
-    }
+  }
+  .header h1 {
+    font-size: var(--text-2xl);
+  }
+  .header p {
+    font-size: var(--text-base);
   }
 }

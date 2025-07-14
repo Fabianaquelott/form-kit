@@ -9,19 +9,19 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     },
     "./core": {
+      "types": "./dist/core/index.d.ts",
       "import": "./dist/core/index.mjs",
-      "require": "./dist/core/index.js",
-      "types": "./dist/core/index.d.ts"
+      "require": "./dist/core/index.js"
     },
     "./ui": {
+      "types": "./dist/ui/index.d.ts",
       "import": "./dist/ui/index.mjs",
-      "require": "./dist/ui/index.js",
-      "types": "./dist/ui/index.d.ts"
+      "require": "./dist/ui/index.js"
     }
   },
   "files": [
@@ -68,7 +68,6 @@
     "jsdom": "^23.2.0",
     "msw": "^2.10.2",
     "prettier": "^3.2.4",
-    "sass": "^1.89.2",
     "tsup": "^8.0.1",
     "typescript": "^5.5.3",
     "vite": "^5.4.2",

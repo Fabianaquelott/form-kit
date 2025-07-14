@@ -1,7 +1,7 @@
 // src/ui/components/Steps/Step5_Complete.tsx
 
 import React from 'react';
-import styles from './Steps.module.scss';
+import styles from './Steps.module.css';
 import { Button } from '../Button/Button';
 
 interface Step5CompleteProps {

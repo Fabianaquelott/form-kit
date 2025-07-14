@@ -4,8 +4,8 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Input } from '../Input/Input';
 import { Label } from '../Label/Label';
-import styles from './Steps.module.scss';
-import formStyles from '../../DefaultAdhesionForm.module.scss'; // Importando estilos compartilhados
+import styles from './Steps.module.css';
+import formStyles from '../../DefaultAdhesionForm.module.css'; // Importando estilos compartilhados
 
 const Step1_PersonalData: React.FC = () => {
   const { register, watch, formState: { errors } } = useFormContext();

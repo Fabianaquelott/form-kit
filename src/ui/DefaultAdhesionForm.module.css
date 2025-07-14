@@ -1,6 +1,6 @@
-// src/ui/DefaultAdhesionForm.module.scss
+/* src/ui/DefaultAdhesionForm.module.css */
 
-// --- Contêiner e Card Principal ---
+/* --- Contêiner e Card Principal --- */
 .container {
   min-height: 100vh;
   display: flex;
@@ -20,7 +20,7 @@
   padding: var(--space-8);
 }
 
-// --- Barra de Progresso ---
+/* --- Barra de Progresso --- */
 .progress {
   margin-bottom: var(--space-8);
 }
@@ -46,7 +46,7 @@
   font-weight: var(--font-medium);
 }
 
-// --- Estrutura e Layout ---
+/* --- Estrutura e Layout --- */
 .form {
   display: flex;
   flex-direction: column;
@@ -85,7 +85,7 @@
   gap: var(--space-4);
 }
 
-// --- Elementos Comuns ---
+/* --- Elementos Comuns --- */
 .checkboxContainer {
   display: flex;
   align-items: center;
@@ -103,10 +103,10 @@
   color: var(--color-primary-600);
   text-decoration: underline;
   font-weight: var(--font-medium);
-  
-  &:hover {
-    color: var(--color-primary-700);
-  }
+}
+
+.link:hover {
+  color: var(--color-primary-700);
 }
 
 .errorMessage {
@@ -129,27 +129,39 @@
   gap: var(--space-3);
   justify-content: space-between;
   margin-top: var(--space-4);
-  
-  &:has(:only-child) {
-    justify-content: flex-end;
+}
+
+.navigation:has(:only-child) {
+  justify-content: flex-end;
+}
+
+/* --- Animações --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-// --- Animações ---
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-// --- Responsividade ---
+/* --- Responsividade --- */
 @media (max-width: 640px) {
-  .container { padding: var(--space-2); }
-  .formCard { padding: var(--space-6); }
-  .stepTitle { font-size: var(--text-xl); }
+  .container {
+    padding: var(--space-2);
+  }
+  .formCard {
+    padding: var(--space-6);
+  }
+  .stepTitle {
+    font-size: var(--text-xl);
+  }
   .navigation {
     flex-direction: column-reverse;
-    &:has(:only-child) {
-      flex-direction: column;
-    }
+  }
+  .navigation:has(:only-child) {
+    flex-direction: column;
   }
 }

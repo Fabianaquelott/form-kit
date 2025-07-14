@@ -4,7 +4,7 @@ import React from 'react'
 import { FormProvider } from 'react-hook-form'
 import { useAdhesionForm } from '@/core'
 import { Button } from './components/Button/Button'
-import styles from './DefaultAdhesionForm.module.scss'
+import styles from './DefaultAdhesionForm.module.css'
 
 import Step1_PersonalData from './components/Steps/Step1_PersonalData'
 import Step2_SmsValidation from './components/Steps/Step2_SmsValidation'

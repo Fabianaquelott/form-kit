@@ -4,7 +4,7 @@ import React from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Input } from '../Input/Input'
 import { Label } from '../Label/Label'
-import styles from './Steps.module.scss'
+import styles from './Steps.module.css'
 
 const Step4_Contract: React.FC = () => {
   const { register, formState: { errors } } = useFormContext()
