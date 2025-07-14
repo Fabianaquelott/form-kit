@@ -134,7 +134,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         setErrors({
           general:
             userResponse.error ||
-            'Não foi possível recuperar dados do usuário.',
+            'Não foi possível recuperar os dados do usuário.',
         })
       }
     },
@@ -152,12 +152,15 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
           emailConfirmed: false,
         })
       }
+
       const [firstname, ...lastnameParts] = data.name!.trim().split(' ')
       const lastname = lastnameParts.join(' ')
       const attempt = currentState.attempt || 1
       const urlParams = currentState.urlParams || {}
       const payload: CreateContactPayload = {
-        ...(data as AdhesionFormData),
+        email: data.email,
+        phone: `+55${data.phone!.replace(/\D/g, '')}`,
+        termsAccepted: data.termsAccepted,
         firstname,
         lastname,
         urlParams,
