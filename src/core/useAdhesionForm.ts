@@ -52,8 +52,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     mode: 'onBlur',
   })
 
-  // --- Efeitos de Sincronização com Sistemas Externos ---
-
   useEffect(() => {
     const subscription = form.watch((value: Partial<AdhesionFormData>) => {
       updateFormData(value)
@@ -91,8 +89,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     onStepChange?.(currentStep)
   }, [currentStep, onStepChange])
 
-  // --- Lógica de Derivação de Estado ---
-
   let referralCoupon: string | null = null
   if (currentStep === 5 && formDataFromStore.contactId) {
     const contactIdNumber = parseInt(formDataFromStore.contactId, 10)
@@ -107,8 +103,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       updateFormData({ referralCoupon })
     }
   }, [referralCoupon, formDataFromStore.referralCoupon, updateFormData])
-
-  // --- Funções de Callback e Submissão ---
 
   const handleApiError = (error: any, step: number) => {
     const errorMessage = error.message || 'Ocorreu um erro inesperado.'
@@ -131,18 +125,16 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         })
         if (contact.aceite_do_termo_de_adesao === 'true') {
           navigation.goToStep(5)
-          return
-        }
-        if (!contact.deal?.cpf && !contact.deal?.cnpj) {
+        } else if (!contact.deal?.cpf && !contact.deal?.cnpj) {
           navigation.goToStep(3)
-          return
+        } else {
+          navigation.goToStep(4)
         }
-        navigation.goToStep(4)
       } else {
         setErrors({
           general:
             userResponse.error ||
-            'Não foi possível recuperar os dados do usuário.',
+            'Não foi possível recuperar dados do usuário.',
         })
       }
     },
@@ -154,14 +146,12 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       const currentState = useFormStore.getState().data
       setSubmitting(true)
       clearErrors()
-
       if (currentState.isEmailConfirmationRequired) {
         updateFormData({
           isEmailConfirmationRequired: false,
           emailConfirmed: false,
         })
       }
-
       const [firstname, ...lastnameParts] = data.name!.trim().split(' ')
       const lastname = lastnameParts.join(' ')
       const attempt = currentState.attempt || 1
@@ -215,11 +205,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     },
     [
       handleExistingUser,
-      setSubmitting,
-      clearErrors,
       updateFormData,
       navigation,
       setErrors,
+      setSubmitting,
+      clearErrors,
       onSubmitError,
     ]
   )
@@ -252,11 +242,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
     },
     [
-      setSubmitting,
-      clearErrors,
       updateFormData,
       navigation,
       setErrors,
+      setSubmitting,
+      clearErrors,
       onSubmitError,
     ]
   )
@@ -266,7 +256,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       const currentState = useFormStore.getState().data
       setSubmitting(true)
       clearErrors()
-
       try {
         if (
           data.documentType === 'cpf' &&
@@ -291,43 +280,42 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
               })
             }
           }
-          return
-        }
-
-        const documentValue =
-          data.documentType === 'cpf'
-            ? data.isBillOwner
-              ? data.myCpf
-              : data.billOwnerCpf
-            : data.cnpj
-
-        if (
-          !currentState.contactId ||
-          !currentState.dealId ||
-          !currentState.name ||
-          !data.documentType ||
-          !documentValue
-        ) {
-          setErrors({ general: 'Dados insuficientes para enviar o documento.' })
-          return
-        }
-
-        const payload = {
-          contactId: currentState.contactId,
-          dealId: currentState.dealId,
-          contactName: currentState.name,
-          document: { type: data.documentType, value: documentValue },
-        }
-        const result = await submitDocuments(payload)
-
-        if (result.success) {
-          updateFormData(data)
-          navigation.nextStep()
         } else {
-          setErrors({
-            general: result.error || 'Não foi possível validar seu documento.',
-          })
-          onSubmitError?.(result.error || 'Erro ao enviar documento.')
+          const documentValue =
+            data.documentType === 'cpf'
+              ? data.isBillOwner
+                ? data.myCpf
+                : data.billOwnerCpf
+              : data.cnpj
+          if (
+            !currentState.contactId ||
+            !currentState.dealId ||
+            !currentState.name ||
+            !data.documentType ||
+            !documentValue
+          ) {
+            setErrors({
+              general: 'Dados insuficientes para enviar o documento.',
+            })
+          } else {
+            const payload = {
+              contactId: currentState.contactId,
+              dealId: currentState.dealId,
+              contactName: currentState.name,
+              document: { type: data.documentType, value: documentValue },
+            }
+            const result = await submitDocuments(payload)
+            if (result.success) {
+              updateFormData(data)
+              navigation.nextStep()
+            } else {
+              setErrors({
+                general:
+                  result.error || 'Não foi possível validar seu documento.',
+              })
+              onSubmitError?.(result.error || 'Erro ao enviar documento.')
+            }
+          }
         }
       } catch (error: any) {
         handleApiError(error, 3)
@@ -336,11 +324,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
     },
     [
-      setSubmitting,
-      clearErrors,
       updateFormData,
       navigation,
       setErrors,
+      setSubmitting,
+      clearErrors,
       onSubmitError,
     ]
   )
@@ -378,11 +366,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
     },
     [
-      setSubmitting,
-      clearErrors,
       updateFormData,
       navigation,
       setErrors,
+      setSubmitting,
+      clearErrors,
       onSubmitSuccess,
       onSubmitError,
     ]

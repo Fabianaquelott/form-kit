@@ -18,7 +18,11 @@ const NEW_USER_DATA = {
 }
 
 const SMS_DATA = { smsCode: '123456' }
-const DOCUMENT_DATA = { documentType: 'cpf' as const, cpf: '12345678909' }
+const DOCUMENT_DATA = {
+  documentType: 'cpf' as const,
+  myCpf: '12345678909',
+  isBillOwner: true,
+}
 const CONTRACT_DATA = { termsAcceptedStep4: true }
 
 const EXISTING_USER_DATA = {
@@ -61,12 +65,15 @@ describe('useAdhesionForm Hook', () => {
     const { result } = renderHook(() => useAdhesionForm())
 
     // Act & Assert (Etapa por Etapa)
+
+    // ETAPA 1: Dados Pessoais
     await act(async () => {
       result.current.form.reset(NEW_USER_DATA)
       await result.current.onSubmit()
     })
     await waitFor(() => expect(result.current.currentStep).toBe(2))
 
+    // ETAPA 2: SMS
     await act(async () => {
       result.current.form.reset({
         ...useFormStore.getState().data,
@@ -76,6 +83,7 @@ describe('useAdhesionForm Hook', () => {
     })
     await waitFor(() => expect(result.current.currentStep).toBe(3))
 
+    // ETAPA 3: Documento
     await act(async () => {
       result.current.form.reset({
         ...useFormStore.getState().data,
@@ -85,6 +93,7 @@ describe('useAdhesionForm Hook', () => {
     })
     await waitFor(() => expect(result.current.currentStep).toBe(4))
 
+    // ETAPA 4: Contrato
     await act(async () => {
       result.current.form.reset({
         ...useFormStore.getState().data,
@@ -94,6 +103,7 @@ describe('useAdhesionForm Hook', () => {
     })
     await waitFor(() => expect(result.current.currentStep).toBe(5))
 
+    // Verificação Final na Etapa 5
     await waitFor(() => {
       expect(result.current.referralCoupon).not.toBeNull()
       expect(result.current.referralCoupon).toContain('10')
@@ -129,7 +139,6 @@ describe('useAdhesionForm Hook', () => {
   })
 
   it('deve lidar com falha na API na Etapa 3 (documentos) e permanecer na mesma etapa', async () => {
-    // Arrange
     act(() => {
       useFormStore.setState({
         currentStep: 3,
@@ -143,7 +152,6 @@ describe('useAdhesionForm Hook', () => {
 
     const { result } = renderHook(() => useAdhesionForm())
 
-    // Act
     await act(async () => {
       result.current.form.reset({
         ...useFormStore.getState().data,
@@ -152,9 +160,8 @@ describe('useAdhesionForm Hook', () => {
       await result.current.onSubmit()
     })
 
-    // Assert
     await waitFor(() => {
-      expect(result.current.currentStep).toBe(3) // Permanece na Etapa 3
+      expect(result.current.currentStep).toBe(3)
       expect(result.current.errors.general).toBe('Documento inválido pela API')
     })
   })
@@ -173,6 +180,9 @@ describe('useAdhesionForm Hook', () => {
           id: 'e-id-1',
           firstname: 'Usuário',
           lastname: 'Antigo',
+          email: EXISTING_USER_DATA.email,
+          aceite_do_termo_de_adesao: 'false',
+          validacao_do_numero: 'true',
           deal: { id: 'd-id-1', cpf: null },
         },
       })
