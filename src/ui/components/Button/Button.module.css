@@ -1,7 +1,6 @@
 @import '../../styles/theme.css';
 
 .button {
-  /* Estilos do 'button-base' aplicados diretamente */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -11,8 +10,6 @@
   cursor: pointer;
   border: none;
   text-decoration: none;
-  
-  /* Estilos específicos do botão */
   gap: var(--space-2);
   font-family: var(--font-sans);
   position: relative;
@@ -144,7 +141,6 @@
 }
 
 /* Focus styles */
-/* CORREÇÃO: Aplicamos os estilos diretamente em vez de usar 'composes' */
 .button:focus-visible {
   outline: 2px solid var(--color-primary-500);
   outline-offset: 2px;
