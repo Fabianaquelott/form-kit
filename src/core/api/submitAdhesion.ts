@@ -21,7 +21,6 @@ const toBase64 = (file: File): Promise<string> =>
     reader.onerror = (error) => reject(error)
   })
 
-// Helper para a API Principal.
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -110,7 +109,16 @@ async function processNewUser(
     phone: payload.phone,
     attempt: payload.attempt,
     cookies: payload.cookies,
-    ...payload.urlParams,
+    utm_campaign: payload.utm_campaign || '',
+    utm_content: payload.utm_content || '',
+    utm_medium: payload.utm_medium || '',
+    utm_source: payload.utm_source || '',
+    utm_term: payload.utm_term || '',
+    hs_facebook_click_id: payload.hs_facebook_click_id || '',
+    hs_google_click_id: payload.hs_google_click_id || '',
+    pf_calculadora__mgm___contactid_de_quem_indicou:
+      payload.pf_calculadora__mgm___contactid_de_quem_indicou || '',
+    interClickRef: payload.interClickRef || '',
   }
 
   const createContactResponse = await apiRequest('/v2/create-contact', {
@@ -126,7 +134,11 @@ async function processNewUser(
   const dealPayload = {
     contact_id: contactId,
     deal_name: payload.name,
-    ...payload.urlParams,
+    utm_campaign: payload.utm_campaign || '',
+    utm_content: payload.utm_content || '',
+    utm_medium: payload.utm_medium || '',
+    utm_source: payload.utm_source || '',
+    utm_term: payload.utm_term || '',
   }
   const createDealResponse = await apiRequest('/v2/create-deal', {
     method: 'POST',

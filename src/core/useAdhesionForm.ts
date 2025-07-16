@@ -21,6 +21,21 @@ import type {
   AcceptContractPayload,
 } from './types'
 
+const getCookiesAsString = (): string => {
+  if (typeof document === 'undefined') return '{}'
+  const cookies = document.cookie.split(';').reduce(
+    (acc, cookie) => {
+      const [key, value] = cookie.split('=').map((c) => c.trim())
+      if (key && value) {
+        acc[key] = decodeURIComponent(value)
+      }
+      return acc
+    },
+    {} as { [key: string]: string }
+  )
+  return JSON.stringify(cookies)
+}
+
 export interface UseAdhesionFormOptions {
   onStepChange?: (step: number) => void
   onSubmitSuccess?: (data: any) => void
@@ -158,13 +173,15 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       const lastname = lastnameParts.join(' ')
       const attempt = currentState.attempt || 1
       const urlParams = currentState.urlParams || {}
+
       const payload: CreateContactPayload = {
         ...(data as AdhesionFormData),
         firstname,
         lastname,
+        phone: `+55${data.phone!.replace(/\D/g, '')}`,
         urlParams,
         attempt,
-        phone: `+55${data.phone!.replace(/\D/g, '')}`,
+        cookies: getCookiesAsString(),
       }
 
       try {
@@ -245,11 +262,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
     },
     [
+      setSubmitting,
+      clearErrors,
       updateFormData,
       navigation,
       setErrors,
-      setSubmitting,
-      clearErrors,
       onSubmitError,
     ]
   )
@@ -283,42 +300,42 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
               })
             }
           }
+          return
+        }
+
+        const documentValue =
+          data.documentType === 'cpf'
+            ? data.isBillOwner
+              ? data.myCpf
+              : data.billOwnerCpf
+            : data.cnpj
+
+        if (
+          !currentState.contactId ||
+          !currentState.dealId ||
+          !currentState.name ||
+          !data.documentType ||
+          !documentValue
+        ) {
+          setErrors({ general: 'Dados insuficientes para enviar o documento.' })
+          return
+        }
+
+        const payload = {
+          contactId: currentState.contactId,
+          dealId: currentState.dealId,
+          contactName: currentState.name,
+          document: { type: data.documentType, value: documentValue },
+        }
+        const result = await submitDocuments(payload)
+        if (result.success) {
+          updateFormData(data)
+          navigation.nextStep()
         } else {
-          const documentValue =
-            data.documentType === 'cpf'
-              ? data.isBillOwner
-                ? data.myCpf
-                : data.billOwnerCpf
-              : data.cnpj
-          if (
-            !currentState.contactId ||
-            !currentState.dealId ||
-            !currentState.name ||
-            !data.documentType ||
-            !documentValue
-          ) {
-            setErrors({
-              general: 'Dados insuficientes para enviar o documento.',
-            })
-          } else {
-            const payload = {
-              contactId: currentState.contactId,
-              dealId: currentState.dealId,
-              contactName: currentState.name,
-              document: { type: data.documentType, value: documentValue },
-            }
-            const result = await submitDocuments(payload)
-            if (result.success) {
-              updateFormData(data)
-              navigation.nextStep()
-            } else {
-              setErrors({
-                general:
-                  result.error || 'Não foi possível validar seu documento.',
-              })
-              onSubmitError?.(result.error || 'Erro ao enviar documento.')
-            }
-          }
+          setErrors({
+            general: result.error || 'Não foi possível validar seu documento.',
+          })
+          onSubmitError?.(result.error || 'Erro ao enviar documento.')
         }
       } catch (error: any) {
         handleApiError(error, 3)
@@ -327,11 +344,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
     },
     [
+      setSubmitting,
+      clearErrors,
       updateFormData,
       navigation,
       setErrors,
-      setSubmitting,
-      clearErrors,
       onSubmitError,
     ]
   )
@@ -369,11 +386,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
     },
     [
+      setSubmitting,
+      clearErrors,
       updateFormData,
       navigation,
       setErrors,
-      setSubmitting,
-      clearErrors,
       onSubmitSuccess,
       onSubmitError,
     ]
