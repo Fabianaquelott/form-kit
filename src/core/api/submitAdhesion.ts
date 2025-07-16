@@ -1,5 +1,3 @@
-// src/core/api/submitAdhesion.ts
-
 import type {
   ApiResponse,
   Contact,
@@ -105,9 +103,19 @@ async function apiErpRequest<T>(
 async function processNewUser(
   payload: CreateContactPayload
 ): Promise<ApiResponse<any>> {
+  const contactPayload = {
+    firstname: payload.firstname,
+    lastname: payload.lastname,
+    email: payload.email,
+    phone: payload.phone,
+    attempt: payload.attempt,
+    cookies: payload.cookies,
+    ...payload.urlParams,
+  }
+
   const createContactResponse = await apiRequest('/v2/create-contact', {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(contactPayload),
   })
 
   if (!createContactResponse.success || !createContactResponse.contact_id) {
@@ -130,11 +138,10 @@ async function processNewUser(
       createDealResponse.error || 'Falha ao criar o negócio associado.'
     )
   }
-
   const smsPayload = {
     contact_id: contactId,
     resend: false,
-    phone: `+55${payload.phone?.replace(/\D/g, '')}`,
+    phone: payload.phone,
   }
   const sendSmsResponse = await apiRequest('/v2/generate-code-sms', {
     method: 'PATCH',

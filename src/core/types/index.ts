@@ -73,10 +73,18 @@ export interface AdhesionFormData {
   referralCoupon?: string
 }
 
-export interface CreateContactPayload extends Partial<AdhesionFormData> {
+export interface CreateContactPayload {
   firstname: string
   lastname: string
+  email: string
+  phone: string
   attempt: number
+  utm_campaign?: string
+  utm_content?: string
+  utm_medium?: string
+  utm_source?: string
+  utm_term?: string
+  [key: string]: any
 }
 
 export interface AcceptContractPayload {

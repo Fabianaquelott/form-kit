@@ -1,5 +1,3 @@
-// src/core/useAdhesionForm.ts
-
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -125,11 +123,13 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
         })
         if (contact.aceite_do_termo_de_adesao === 'true') {
           navigation.goToStep(5)
-        } else if (!contact.deal?.cpf && !contact.deal?.cnpj) {
-          navigation.goToStep(3)
-        } else {
-          navigation.goToStep(4)
+          return
         }
+        if (!contact.deal?.cpf && !contact.deal?.cnpj) {
+          navigation.goToStep(3)
+          return
+        }
+        navigation.goToStep(4)
       } else {
         setErrors({
           general:
@@ -146,6 +146,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       const currentState = useFormStore.getState().data
       setSubmitting(true)
       clearErrors()
+
       if (currentState.isEmailConfirmationRequired) {
         updateFormData({
           isEmailConfirmationRequired: false,
@@ -158,13 +159,12 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       const attempt = currentState.attempt || 1
       const urlParams = currentState.urlParams || {}
       const payload: CreateContactPayload = {
-        email: data.email,
-        phone: `+55${data.phone!.replace(/\D/g, '')}`,
-        termsAccepted: data.termsAccepted,
+        ...(data as AdhesionFormData),
         firstname,
         lastname,
         urlParams,
         attempt,
+        phone: `+55${data.phone!.replace(/\D/g, '')}`,
       }
 
       try {
@@ -208,11 +208,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     },
     [
       handleExistingUser,
+      setSubmitting,
+      clearErrors,
       updateFormData,
       navigation,
       setErrors,
-      setSubmitting,
-      clearErrors,
       onSubmitError,
     ]
   )
