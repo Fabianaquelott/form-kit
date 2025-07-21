@@ -5,6 +5,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useFormStore } from './state/formStore'
 import { useAdhesionForm } from './useAdhesionForm'
 import * as api from './api/submitAdhesion'
+import { FlowStep } from './types'
 
 vi.mock('./api/submitAdhesion')
 
@@ -18,7 +19,7 @@ const NEW_USER_DATA = {
 const SMS_DATA = { smsCode: '123456' }
 const DOCUMENT_DATA = {
   documentType: 'cpf' as const,
-  myCpf: '12345678909',
+  myCpf: '123.456.789-09',
   isBillOwner: true,
 }
 const CONTRACT_DATA = { termsAcceptedStep4: true }
@@ -103,7 +104,7 @@ describe('useAdhesionForm Hook', () => {
 
     await waitFor(() => {
       expect(result.current.referralCoupon).not.toBeNull()
-      expect(result.current.referralCoupon).toContain('10')
+      expect(result.current.referralCoupon).toBe('10320D')
     })
   })
 
@@ -294,5 +295,192 @@ describe('useAdhesionForm Hook', () => {
       expect(result.current.errors.general).toBe('Limite de reenvios atingido')
       expect(result.current.resendCooldown).toBe(0)
     })
+  })
+})
+
+// ==================================================================
+// --- SUÍTE DE TESTES PARA VALIDAÇÃO DE PAYLOADS E FLUXOS ---
+// ==================================================================
+describe('Validação de Payloads e Fluxos da API', () => {
+  beforeEach(() => {
+    act(() => {
+      useFormStore.getState().resetForm()
+    })
+    vi.clearAllMocks()
+
+    Object.defineProperty(document, 'cookie', {
+      writable: true,
+      value:
+        '_ga=GA1.1.2118071165.1750798754; _ga_XDN3ECHJXG=GS2.1.s1752604455',
+    })
+  })
+
+  it('deve montar e enviar o payload correto para handleStep1Submission (create-contact/deal)', async () => {
+    vi.mocked(api.handleStep1Submission).mockResolvedValue({
+      success: true,
+      contact_id: 'contact-123',
+      deal: { deal_id: 'deal-456' },
+    })
+    const { result } = renderHook(() => useAdhesionForm())
+
+    await act(async () => {
+      result.current.form.reset(NEW_USER_DATA)
+      await result.current.onSubmit()
+    })
+
+    await waitFor(() => {
+      expect(api.handleStep1Submission).toHaveBeenCalledTimes(1)
+      const actualPayload = vi.mocked(api.handleStep1Submission).mock
+        .calls[0][0]
+      expect(actualPayload.firstname).toBe('Novo')
+      expect(actualPayload.lastname).toBe('Usuário Teste Completo')
+      expect(actualPayload.email).toBe('completo@teste.com')
+      expect(actualPayload.phone).toBe('+5511911112222')
+      expect(actualPayload.attempt).toBe(1)
+      expect(actualPayload.cookies).toBe(
+        JSON.stringify({
+          _ga: 'GA1.1.2118071165.1750798754',
+          _ga_XDN3ECHJXG: 'GS2.1.s1752604455',
+        })
+      )
+    })
+  })
+
+  it('deve montar e enviar o payload correto para validateSms', async () => {
+    vi.mocked(api.validateSms).mockResolvedValue({ success: true })
+    act(() => {
+      useFormStore.setState({
+        currentStep: 2,
+        data: { contactId: '139974446649' },
+      })
+    })
+
+    const { result } = renderHook(() => useAdhesionForm())
+
+    await act(async () => {
+      result.current.form.setValue('smsCode', '281591')
+      await result.current.onSubmit()
+    })
+
+    await waitFor(() => {
+      expect(api.validateSms).toHaveBeenCalledTimes(1)
+    })
+
+    const expectedPayload = {
+      contactId: '139974446649',
+      smsCode: '281591',
+    }
+
+    expect(api.validateSms).toHaveBeenCalledWith(expectedPayload)
+  })
+
+  it('deve montar e enviar o payload correto para submitDocuments (CPF)', async () => {
+    vi.mocked(api.submitDocuments).mockResolvedValue({ success: true })
+    const contactData = {
+      contactId: '139974446649',
+      dealId: '40599079765',
+      name: 'rafael felipe ribeiro',
+    }
+    act(() => {
+      useFormStore.setState({ currentStep: 3, data: contactData })
+    })
+
+    const { result } = renderHook(() => useAdhesionForm())
+
+    const documentData = {
+      documentType: 'cpf' as const,
+      isBillOwner: true,
+      myCpf: '514.724.250-30',
+    }
+
+    await act(async () => {
+      result.current.form.reset({ ...contactData, ...documentData })
+      await result.current.onSubmit()
+    })
+
+    await waitFor(() => expect(api.submitDocuments).toHaveBeenCalledTimes(1))
+
+    const expectedPayload = {
+      contactId: '139974446649',
+      dealId: '40599079765',
+      contactName: 'rafael felipe ribeiro',
+      document: {
+        type: 'cpf',
+        value: '514.724.250-30',
+      },
+    }
+
+    expect(api.submitDocuments).toHaveBeenCalledWith(expectedPayload)
+  })
+
+  it('deve montar e enviar o payload correto para acceptContract', async () => {
+    vi.mocked(api.acceptContract).mockResolvedValue({ success: true })
+    const stateData = {
+      contactId: '139974446649',
+    }
+    act(() => {
+      useFormStore.setState({ currentStep: 4, data: stateData })
+    })
+    const { result } = renderHook(() => useAdhesionForm())
+
+    const contractData = {
+      termsAcceptedStep4: true,
+      coupon: 'M158781515',
+    }
+
+    await act(async () => {
+      result.current.form.reset({ ...stateData, ...contractData })
+      await result.current.onSubmit()
+    })
+
+    await waitFor(() => expect(api.acceptContract).toHaveBeenCalledTimes(1))
+
+    const expectedPayload = {
+      contact_id: '139974446649',
+      cupom_indicacao: 'M158781515',
+      app: false,
+    }
+
+    expect(api.acceptContract).toHaveBeenCalledWith(expectedPayload)
+  })
+
+  it('deve gerar o cupom de indicação corretamente na etapa 5', () => {
+    const contactId = '139974446649'
+    act(() => {
+      useFormStore.setState({
+        currentStep: 5,
+        data: { contactId: contactId },
+      })
+    })
+
+    const { result } = renderHook(() => useAdhesionForm())
+
+    const expectedCoupon = '10209720900D'
+
+    expect(result.current.referralCoupon).toBe(expectedCoupon)
+  })
+
+  it('deve pular etapas de acordo com o flowConfig (ex: pular SMS)', async () => {
+    vi.mocked(api.handleStep1Submission).mockResolvedValue({
+      success: true,
+      contact_id: 'skip-sms-contact',
+      deal: { deal_id: 'skip-sms-deal' },
+    })
+
+    const steps: FlowStep[] = [1, 3, 4, 5]
+    const flowConfig = {
+      steps: steps,
+    }
+
+    const { result } = renderHook(() => useAdhesionForm({ flowConfig }))
+
+    expect(result.current.currentStep).toBe(1)
+
+    await act(async () => {
+      result.current.form.reset(NEW_USER_DATA)
+      await result.current.onSubmit()
+    })
+
+    await waitFor(() => expect(result.current.currentStep).toBe(3))
   })
 })
