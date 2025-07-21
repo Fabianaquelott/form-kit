@@ -133,7 +133,7 @@ async function processNewUser(
 
   const dealPayload = {
     contact_id: contactId,
-    deal_name: payload.name,
+    deal_name: payload.deal_name,
     utm_campaign: payload.utm_campaign || '',
     utm_content: payload.utm_content || '',
     utm_medium: payload.utm_medium || '',
@@ -231,7 +231,9 @@ export async function submitDocuments(payload: {
   const updateDealPayload: Partial<Deal> = {
     deal_id: payload.dealId,
     contact_id: payload.contactId,
-    deal_name: `${payload.contactName} - ${payload.document.type.toUpperCase()}: ${payload.document.value}`,
+    deal_name: `${
+      payload.contactName
+    } - ${payload.document.type.toUpperCase()}: ${payload.document.value}`,
     [payload.document.type]: payload.document.value,
     natureza_juridica:
       payload.document.type === 'cpf' ? 'Pessoa Física' : 'Pessoa Jurídica',

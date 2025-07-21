@@ -186,13 +186,22 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       const urlParams = currentState.urlParams || {}
 
       const payload: CreateContactPayload = {
-        ...(data as AdhesionFormData),
         firstname,
         lastname,
+        deal_name: data.name!,
+        email: data.email!,
         phone: `+55${data.phone!.replace(/\D/g, '')}`,
-        urlParams,
         attempt,
         cookies: getCookiesAsString(),
+        utm_campaign: urlParams.utm_campaign || '',
+        utm_content: urlParams.utm_content || '',
+        utm_medium: urlParams.utm_medium || '',
+        utm_source: urlParams.utm_source || '',
+        utm_term: urlParams.utm_term || '',
+        hs_facebook_click_id: urlParams.hs_facebook_click_id || '',
+        hs_google_click_id: urlParams.hs_google_click_id || '',
+        pf_calculadora__mgm___contactid_de_quem_indicou: '',
+        interClickRef: '',
       }
 
       try {
