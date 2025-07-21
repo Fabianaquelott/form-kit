@@ -2,10 +2,11 @@
 
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import type { AdhesionFormState, AdhesionFormData } from '../types'
+import type { AdhesionFormState, AdhesionFormData, FlowStep } from '../types'
 
 interface FormStoreActions {
-  setCurrentStep: (step: number) => void
+  setCurrentStep: (step: FlowStep) => void
+  setSteps: (steps: FlowStep[]) => void
   nextStep: () => void
   previousStep: () => void
   updateFormData: (data: Partial<AdhesionFormData>) => void
@@ -20,6 +21,7 @@ type FormStore = AdhesionFormState & FormStoreActions
 const initialState: AdhesionFormState = {
   currentStep: 1,
   totalSteps: 5,
+  steps: [1, 2, 3, 4, 5],
   data: {
     isEmailConfirmationRequired: false,
   },
@@ -29,35 +31,29 @@ const initialState: AdhesionFormState = {
 
 export const useFormStore = create<FormStore>()(
   devtools(
-    (set) => ({
+    (set, get) => ({
       ...initialState,
 
-      setCurrentStep: (step: number) =>
-        set(
-          (state) => ({
-            currentStep: Math.max(1, Math.min(step, state.totalSteps)),
-          }),
-          false,
-          'setCurrentStep'
-        ),
+      setSteps: (steps: FlowStep[]) =>
+        set({ steps, totalSteps: steps.length, currentStep: steps[0] || 1 }),
 
-      nextStep: () =>
-        set(
-          (state) => ({
-            currentStep: Math.min(state.currentStep + 1, state.totalSteps),
-          }),
-          false,
-          'nextStep'
-        ),
+      setCurrentStep: (step: FlowStep) => set({ currentStep: step }),
 
-      previousStep: () =>
-        set(
-          (state) => ({
-            currentStep: Math.max(state.currentStep - 1, 1),
-          }),
-          false,
-          'previousStep'
-        ),
+      nextStep: () => {
+        const { currentStep, steps } = get()
+        const currentIndex = steps.indexOf(currentStep)
+        if (currentIndex < steps.length - 1) {
+          set({ currentStep: steps[currentIndex + 1] })
+        }
+      },
+
+      previousStep: () => {
+        const { currentStep, steps } = get()
+        const currentIndex = steps.indexOf(currentStep)
+        if (currentIndex > 0) {
+          set({ currentStep: steps[currentIndex - 1] })
+        }
+      },
 
       updateFormData: (newData: Partial<AdhesionFormData>) =>
         set(
@@ -69,18 +65,13 @@ export const useFormStore = create<FormStore>()(
         ),
 
       clearErrors: () => set(() => ({ errors: {} }), false, 'clearErrors'),
-
       setSubmitting: (isSubmitting: boolean) =>
         set(() => ({ isSubmitting }), false, 'setSubmitting'),
-
       setErrors: (errors: Record<string, string>) =>
         set(() => ({ errors }), false, 'setErrors'),
-
       resetForm: () => set(() => ({ ...initialState }), false, 'resetForm'),
     }),
-    {
-      name: 'adhesion-form-store',
-    }
+    { name: 'adhesion-form-store' }
   )
 )
 

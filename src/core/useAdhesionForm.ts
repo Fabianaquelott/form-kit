@@ -1,3 +1,5 @@
+// src/core/useAdhesionForm.ts
+
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -19,6 +21,7 @@ import type {
   UrlParams,
   FormErrors,
   AcceptContractPayload,
+  FlowConfig,
 } from './types'
 
 const getCookiesAsString = (): string => {
@@ -37,13 +40,14 @@ const getCookiesAsString = (): string => {
 }
 
 export interface UseAdhesionFormOptions {
+  flowConfig?: FlowConfig
   onStepChange?: (step: number) => void
   onSubmitSuccess?: (data: any) => void
   onSubmitError?: (error: string) => void
 }
 
 export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
-  const { onStepChange, onSubmitSuccess, onSubmitError } = options
+  const { flowConfig, onStepChange, onSubmitSuccess, onSubmitError } = options
   const {
     currentStep,
     data: formDataFromStore,
@@ -54,8 +58,15 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     setErrors,
     clearErrors,
     resetForm,
+    setSteps,
   } = useFormStore()
   const navigation = useFormNavigation()
+
+  useEffect(() => {
+    if (flowConfig) {
+      setSteps(flowConfig.steps)
+    }
+  }, [flowConfig, setSteps])
 
   const [resendCooldown, setResendCooldown] = useState(0)
 
@@ -90,7 +101,9 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       const params = new URLSearchParams(window.location.search)
       const urlParams: UrlParams = {}
       for (const [key, value] of params.entries()) {
-        urlParams[key] = value
+        if (key.startsWith('utm_') || key.startsWith('hs_')) {
+          urlParams[key] = value
+        }
       }
       if (Object.keys(urlParams).length > 0) {
         updateFormData({ urlParams })
@@ -116,7 +129,6 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       updateFormData({ referralCoupon })
     }
   }, [referralCoupon, formDataFromStore.referralCoupon, updateFormData])
-
   const handleApiError = (error: any, step: number) => {
     const errorMessage = error.message || 'Ocorreu um erro inesperado.'
     console.error(`Erro na Etapa ${step}:`, error)
@@ -136,15 +148,14 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
           email: contact.email,
           contact,
         })
+
         if (contact.aceite_do_termo_de_adesao === 'true') {
           navigation.goToStep(5)
-          return
-        }
-        if (!contact.deal?.cpf && !contact.deal?.cnpj) {
+        } else if (!contact.deal?.cpf && !contact.deal?.cnpj) {
           navigation.goToStep(3)
-          return
+        } else {
+          navigation.goToStep(4)
         }
-        navigation.goToStep(4)
       } else {
         setErrors({
           general:

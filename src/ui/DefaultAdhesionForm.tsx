@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { FormProvider } from 'react-hook-form'
-import { useAdhesionForm } from '@/core'
+import { useAdhesionForm, FlowConfig } from '@/core'
 import { Button } from './components/Button/Button'
 import styles from './DefaultAdhesionForm.module.css'
 
@@ -13,17 +13,20 @@ import Step4_Contract from './components/Steps/Step4_Contract'
 import Step5_Complete from './components/Steps/Step5_Complete'
 
 export interface DefaultAdhesionFormProps {
+  flowConfig?: FlowConfig;
   onSuccess?: (data: any) => void;
   onError?: (error: string) => void;
   className?: string;
 }
 
 export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
+  flowConfig,
   onSuccess,
   onError,
   className,
 }) => {
   const formMethods = useAdhesionForm({
+    flowConfig,
     onSubmitSuccess: onSuccess,
     onSubmitError: onError,
   });
@@ -52,7 +55,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
           />
         );
       case 3:
-        return <Step3_Document />;
+        return <Step3_Document documentType={flowConfig?.documentType || 'both'} />;
       case 4:
         return <Step4_Contract />;
       case 5:
@@ -69,11 +72,11 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
           <div className={styles.progressBar}>
             <div
               className={styles.progressFill}
-              style={{ width: `${(currentStep / 5) * 100}%` }}
+              style={{ width: `${((navigation.currentStepIndex + 1) / navigation.totalSteps) * 100}%` }}
             />
           </div>
           <span className={styles.progressText}>
-            Etapa {currentStep} de 5
+            Etapa {navigation.currentStepIndex + 1} de {navigation.totalSteps}
           </span>
         </div>
         <FormProvider {...formMethods.form}>

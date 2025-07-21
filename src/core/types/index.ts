@@ -2,6 +2,13 @@
 
 import { FieldErrors } from 'react-hook-form'
 
+export type FlowStep = 1 | 2 | 3 | 4 | 5
+
+export interface FlowConfig {
+  steps: FlowStep[]
+  documentType?: 'cpf' | 'cnpj'
+}
+
 export interface UrlParams {
   hs_facebook_click_id?: string
   hs_google_click_id?: string
@@ -99,8 +106,9 @@ export type FormErrors = FieldErrors<AdhesionFormData> & {
 }
 
 export interface AdhesionFormState {
-  currentStep: number
+  currentStep: FlowStep
   totalSteps: number
+  steps: FlowStep[]
   data: Partial<AdhesionFormData>
   isSubmitting: boolean
   errors: { general?: string; [key: string]: any }
@@ -111,6 +119,8 @@ export interface FormNavigationState {
   canGoPrevious: boolean
   isFirstStep: boolean
   isLastStep: boolean
+  currentStepIndex: number
+  totalSteps: number
 }
 
 export interface ApiResponse<T = any> {

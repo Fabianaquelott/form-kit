@@ -1,28 +1,37 @@
-import { useMemo } from 'react'
+// src/core/hooks/useFormNavigation.ts
 
-import type { FormNavigationState } from '../types'
+import { useMemo } from 'react'
+import type { FormNavigationState, FlowStep } from '../types'
 import { useFormStore } from '../state/formStore'
 
 export const useFormNavigation = (): FormNavigationState & {
-  goToStep: (step: number) => void
+  goToStep: (step: FlowStep) => void
   nextStep: () => void
   previousStep: () => void
 } => {
-  const { currentStep, totalSteps, nextStep, previousStep, setCurrentStep } = useFormStore()
-  
-  const navigationState = useMemo((): FormNavigationState => ({
-    canGoNext: currentStep < totalSteps,
-    canGoPrevious: currentStep > 1,
-    isFirstStep: currentStep === 1,
-    isLastStep: currentStep === totalSteps,
-  }), [currentStep, totalSteps])
-  
-  const goToStep = (step: number) => {
-    if (step >= 1 && step <= totalSteps) {
+  const { currentStep, steps, nextStep, previousStep, setCurrentStep } =
+    useFormStore()
+
+  const navigationState = useMemo((): FormNavigationState => {
+    const totalStepsInFlow = steps.length
+    const currentStepIndexInFlow = steps.indexOf(currentStep)
+
+    return {
+      currentStepIndex: currentStepIndexInFlow,
+      totalSteps: totalStepsInFlow,
+      canGoNext: currentStepIndexInFlow < totalStepsInFlow - 1,
+      canGoPrevious: currentStepIndexInFlow > 0,
+      isFirstStep: currentStepIndexInFlow === 0,
+      isLastStep: currentStepIndexInFlow === totalStepsInFlow - 1,
+    }
+  }, [currentStep, steps])
+
+  const goToStep = (step: FlowStep) => {
+    if (steps.includes(step)) {
       setCurrentStep(step)
     }
   }
-  
+
   return {
     ...navigationState,
     goToStep,
