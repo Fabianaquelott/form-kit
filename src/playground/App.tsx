@@ -9,6 +9,7 @@ import {
   QuickCaptureAdhesionForm,
   DefaultAdhesionFormProps
 } from '@/ui';
+import { useFormStore, FormStore } from '@/core';
 import './App.css';
 
 type FormVariant = 'default' | 'cpfOnly' | 'cnpjOnly' | 'noSms' | 'quickCapture';
@@ -33,6 +34,8 @@ const formTitles: Record<FormVariant, string> = {
 function App() {
   const [activeForm, setActiveForm] = useState<FormVariant>('default');
 
+  const resetFormState = useFormStore((state: FormStore) => state.resetForm);
+
   const handleSuccess = (data: any) => {
     console.log(`✅ Sucesso no fluxo "${formTitles[activeForm]}":`, data);
     alert('Sucesso! Veja o console.');
@@ -40,6 +43,11 @@ function App() {
 
   const handleError = (error: string) => {
     console.error(`❌ Erro no fluxo "${formTitles[activeForm]}":`, error);
+  };
+
+  const handleVariantChange = (variant: FormVariant) => {
+    resetFormState();
+    setActiveForm(variant);
   };
 
   const ActiveFormComponent = formComponents[activeForm];
@@ -54,7 +62,7 @@ function App() {
             <button
               key={key}
               className={activeForm === key ? 'active' : ''}
-              onClick={() => setActiveForm(key as FormVariant)}
+              onClick={() => handleVariantChange(key as FormVariant)}
             >
               {formTitles[key as FormVariant]}
             </button>

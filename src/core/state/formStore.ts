@@ -16,7 +16,7 @@ interface FormStoreActions {
   resetForm: () => void
 }
 
-type FormStore = AdhesionFormState & FormStoreActions
+export type FormStore = AdhesionFormState & FormStoreActions
 
 const initialState: AdhesionFormState = {
   currentStep: 1,

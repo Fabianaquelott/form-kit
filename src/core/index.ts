@@ -1,3 +1,5 @@
+// src/core/index.ts
+
 // Main hook
 export { useAdhesionForm } from './useAdhesionForm'
 export type {
@@ -13,6 +15,7 @@ export {
   useIsSubmitting,
   useFormErrors,
 } from './state/formStore'
+export type { FormStore } from './state/formStore'
 
 // Hooks
 export { useFormNavigation } from './hooks/useFormNavigation'
@@ -27,5 +30,9 @@ export * from './schemas/adhesionSchema'
 export {
   handleStep1Submission,
   validateSms,
+  getUserByEmail,
   resendSms,
+  submitDocuments,
+  uploadBillFile,
+  acceptContract,
 } from './api/submitAdhesion'
