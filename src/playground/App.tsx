@@ -1,25 +1,70 @@
-/* import React from 'react';
-import { DefaultAdhesionForm } from '../ui/DefaultAdhesionForm';
+// src/playground/App.tsx
+
+import React, { useState } from 'react';
+import {
+  DefaultAdhesionForm,
+  CpfOnlyAdhesionForm,
+  CnpjOnlyAdhesionForm,
+  NoSmsAdhesionForm,
+  QuickCaptureAdhesionForm,
+  DefaultAdhesionFormProps
+} from '@/ui';
+import './App.css';
+
+type FormVariant = 'default' | 'cpfOnly' | 'cnpjOnly' | 'noSms' | 'quickCapture';
+
+const formComponents: Record<FormVariant, React.FC<DefaultAdhesionFormProps>> = {
+  default: DefaultAdhesionForm,
+  cpfOnly: CpfOnlyAdhesionForm,
+  cnpjOnly: CnpjOnlyAdhesionForm,
+  noSms: NoSmsAdhesionForm,
+  quickCapture: QuickCaptureAdhesionForm,
+};
+
+const formTitles: Record<FormVariant, string> = {
+  default: 'Fluxo Padrão Completo',
+  cpfOnly: 'Fluxo Apenas CPF',
+  cnpjOnly: 'Fluxo Apenas CNPJ',
+  noSms: 'Fluxo Sem Etapa de SMS',
+  quickCapture: 'Fluxo de Captura Rápida',
+};
+
 
 function App() {
+  const [activeForm, setActiveForm] = useState<FormVariant>('default');
+
   const handleSuccess = (data: any) => {
-    console.log('🎉 Adesão concluída com sucesso!', data);
-    alert('Adesão realizada com sucesso!');
+    console.log(`✅ Sucesso no fluxo "${formTitles[activeForm]}":`, data);
+    alert('Sucesso! Veja o console.');
   };
 
   const handleError = (error: string) => {
-    console.error('❌ Erro na adesão:', error);
+    console.error(`❌ Erro no fluxo "${formTitles[activeForm]}":`, error);
   };
 
-  return (
-    <div className="app">
-      <div className="header">
-        <h1>Adhesion Form Lib - Playground</h1>
-        <p>Ambiente de desenvolvimento para testar a biblioteca</p>
-      </div>
+  const ActiveFormComponent = formComponents[activeForm];
 
-      <main>
-        <DefaultAdhesionForm
+  return (
+    <div className="playground-container">
+      <header className="playground-header">
+        <h1>Bulbe Form Kit - Playground</h1>
+        <p>Selecione uma variação do formulário para testar:</p>
+        <nav className="form-selector">
+          {Object.keys(formComponents).map((key) => (
+            <button
+              key={key}
+              className={activeForm === key ? 'active' : ''}
+              onClick={() => setActiveForm(key as FormVariant)}
+            >
+              {formTitles[key as FormVariant]}
+            </button>
+          ))}
+        </nav>
+      </header>
+
+      <main className="playground-main">
+        <ActiveFormComponent
+          key={activeForm}
           onSuccess={handleSuccess}
           onError={handleError}
         />
@@ -28,113 +73,4 @@ function App() {
   );
 }
 
-export default App; */
-
-
-
-
-/* import { CpfOnlyAdhesionForm } from '@/ui'
-import './App.css'
-
-function App() {
-  const handleSuccess = (data: any) => {
-    console.log('✅ Adesão CPF-Only com Sucesso:', data);
-    alert('Sucesso! Veja o console.');
-  };
-
-  const handleError = (error: string) => {
-    console.error('❌ Erro na Adesão CPF-Only:', error);
-  };
-
-  return (
-    <div className="app-container">
-      <CpfOnlyAdhesionForm
-        onSuccess={handleSuccess}
-        onError={handleError}
-      />
-    </div>
-  )
-}
-
-export default App */
-
-
-
-import { CnpjOnlyAdhesionForm } from '@/ui'
-import './App.css'
-
-function App() {
-  const handleSuccess = (data: any) => {
-    console.log('✅ Adesão CNPJ-Only com Sucesso:', data);
-    alert('Sucesso! Veja o console.');
-  };
-
-  const handleError = (error: string) => {
-    console.error('❌ Erro na Adesão CNPJ-Only:', error);
-  };
-
-  return (
-    <div className="app-container">
-      <CnpjOnlyAdhesionForm
-        onSuccess={handleSuccess}
-        onError={handleError}
-      />
-    </div>
-  )
-}
-
-export default App
-
-
-
-/* import { NoSmsAdhesionForm } from '@/ui'
-import './App.css'
-
-function App() {
-  const handleSuccess = (data: any) => {
-    console.log('✅ Adesão Sem SMS com Sucesso:', data);
-    alert('Sucesso! Veja o console.');
-  };
-
-  const handleError = (error: string) => {
-    console.error('❌ Erro na Adesão Sem SMS:', error);
-  };
-
-  return (
-    <div className="app-container">
-      <NoSmsAdhesionForm
-        onSuccess={handleSuccess}
-        onError={handleError}
-      />
-    </div>
-  )
-}
-
-export default App */
-
-
-
-/* import { QuickCaptureAdhesionForm } from '@/ui'
-import './App.css'
-
-function App() {
-  const handleSuccess = (data: any) => {
-    console.log('✅ Captura Rápida com Sucesso:', data);
-    alert('Sucesso! Veja o console.');
-  };
-
-  const handleError = (error: string) => {
-    console.error('❌ Erro na Captura Rápida:', error);
-  };
-
-  return (
-    <div className="app-container">
-      <QuickCaptureAdhesionForm
-        onSuccess={handleSuccess}
-        onError={handleError}
-      />
-    </div>
-  )
-}
-
-export default App */
+export default App;

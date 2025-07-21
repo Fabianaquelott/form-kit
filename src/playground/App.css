@@ -1,54 +1,70 @@
-/* playground/App.css */
-
-.app {
-  min-height: 100vh;
-  font-family: var(--font-sans);
-}
-
-.header {
-  background: linear-gradient(135deg, var(--color-primary-600), var(--color-primary-800));
-  color: var(--color-white);
-  padding: var(--space-8);
-  text-align: center;
-  box-shadow: var(--shadow-md);
-}
-
-.header h1 {
-  font-size: var(--text-3xl);
-  font-weight: var(--font-bold);
-  margin: 0 0 var(--space-2) 0;
-  line-height: var(--leading-tight);
-}
-
-.header p {
-  font-size: var(--text-lg);
-  opacity: 0.9;
-  margin: 0;
-  line-height: var(--leading-normal);
-}
-
-/* Global styles reset */
-* {
-  box-sizing: border-box;
-}
+/* src/playground/App.css */
 
 body {
   margin: 0;
   font-family: var(--font-sans);
-  background-color: var(--color-gray-50);
-  color: var(--color-gray-900);
-  line-height: var(--leading-normal);
+  background-color: var(--color-gray-100);
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .header {
-    padding: var(--space-6);
-  }
-  .header h1 {
-    font-size: var(--text-2xl);
-  }
-  .header p {
-    font-size: var(--text-base);
-  }
+.playground-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.playground-header {
+  background: var(--color-gray-800);
+  color: var(--color-white);
+  padding: var(--space-6) var(--space-8);
+  box-shadow: var(--shadow-lg);
+}
+
+.playground-header h1 {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  margin: 0 0 var(--space-2);
+}
+
+.playground-header p {
+  margin: 0 0 var(--space-4);
+  opacity: 0.8;
+}
+
+.form-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.form-selector button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  font-weight: var(--font-medium);
+  transition: all var(--transition-fast);
+  border: none;
+  cursor: pointer;
+  background-color: var(--color-gray-700);
+  color: var(--color-gray-200);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.form-selector button:hover {
+  background-color: var(--color-gray-600);
+}
+
+.form-selector button.active {
+  background-color: var(--color-primary-600);
+  color: var(--color-white);
+  font-weight: var(--font-semibold);
+}
+
+.playground-main {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--space-8) 0;
 }
