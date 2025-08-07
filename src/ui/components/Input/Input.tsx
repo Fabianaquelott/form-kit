@@ -21,7 +21,6 @@ const inputVariants = cva(styles.input, {
   },
 });
 
-// CORREÇÃO: Usamos Omit para remover a prop 'size' conflitante dos atributos do HTML.
 export interface InputProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
   VariantProps<typeof inputVariants> {

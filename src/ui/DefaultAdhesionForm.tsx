@@ -6,11 +6,12 @@ import { useAdhesionForm, FlowConfig } from '@/core'
 import { Button } from './components/Button/Button'
 import styles from './DefaultAdhesionForm.module.css'
 
-import Step1_PersonalData from './components/Steps/Step1_PersonalData'
+import StepOnePersonalData from './components/Steps/StepOnePersonalData'
 import Step2_SmsValidation from './components/Steps/Step2_SmsValidation'
 import Step3_Document from './components/Steps/Step3_Document'
 import Step4_Contract from './components/Steps/Step4_Contract'
 import Step5_Complete from './components/Steps/Step5_Complete'
+import { StepIndicator } from './components/StepIndicator/StepIndicator'
 
 export interface DefaultAdhesionFormProps {
   flowConfig?: FlowConfig;
@@ -45,7 +46,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
-        return <Step1_PersonalData />;
+        return <StepOnePersonalData />;
       case 2:
         return (
           <Step2_SmsValidation
@@ -68,17 +69,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
   return (
     <div className={`${styles.container} ${className || ''}`}>
       <div className={styles.formCard}>
-        <div className={styles.progress}>
-          <div className={styles.progressBar}>
-            <div
-              className={styles.progressFill}
-              style={{ width: `${((navigation.currentStepIndex + 1) / navigation.totalSteps) * 100}%` }}
-            />
-          </div>
-          <span className={styles.progressText}>
-            Etapa {navigation.currentStepIndex + 1} de {navigation.totalSteps}
-          </span>
-        </div>
+        <StepIndicator currentStep={navigation.currentStepIndex} totalSteps={navigation.totalSteps} />
         <FormProvider {...formMethods.form}>
           <form onSubmit={onSubmit} className={styles.form}>
             {renderCurrentStep()}

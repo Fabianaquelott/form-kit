@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import formStyles from '../../DefaultAdhesionForm.module.css'; // Importando estilos compartilhados
 import { Input } from '../Input/Input';
 import { Label } from '../Label/Label';
 import styles from './Steps.module.css';
-import formStyles from '../../DefaultAdhesionForm.module.css'; // Importando estilos compartilhados
 
 const Step1_PersonalData: React.FC = () => {
   const { register, watch, formState: { errors } } = useFormContext();
@@ -14,9 +14,9 @@ const Step1_PersonalData: React.FC = () => {
   return (
     <div className={styles.stepContainer}>
       <div className={styles.stepHeader}>
-        <h2 className={styles.stepTitle}>Dados Pessoais</h2>
+        <p className={styles.stepTitle}>Sua conta de <p>luz <span className={styles.stepTitleBold}>mais leve.</span></p></p>
         <p className={styles.stepDescription}>
-          Preencha seus dados para iniciar o processo de adesão.
+          Junte-se a mais de 50 mil famílias e garanta até <p>15% de desconto no consumo de sua conta de luz</p> <p className={styles.stepDescriptionBold}>de forma simples e digital.</p>
         </p>
       </div>
       <div className={styles.stepContent}>

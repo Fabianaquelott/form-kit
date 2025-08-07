@@ -13,7 +13,7 @@
 
 .formCard {
   width: 100%;
-  max-width: 32rem;
+  max-width: 40rem;
   background-color: var(--color-white);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
