@@ -1,18 +1,16 @@
-// src/ui/components/Steps/Step2_SmsValidation.tsx
-
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Input } from '../Input/Input';
 import { Button } from '../Button/Button';
 import styles from './Steps.module.css';
 
-interface Step2SmsValidationProps {
+interface StepTwoSmsValidationProps {
   handleResendSms: () => void;
   resendCooldown: number;
   isSubmitting: boolean;
 }
 
-const Step2_SmsValidation: React.FC<Step2SmsValidationProps> = ({
+const StepTwoSmsValidation: React.FC<StepTwoSmsValidationProps> = ({
   handleResendSms,
   resendCooldown,
   isSubmitting
@@ -22,15 +20,18 @@ const Step2_SmsValidation: React.FC<Step2SmsValidationProps> = ({
   return (
     <div className={styles.stepContainer}>
       <div className={styles.stepHeader}>
-        <h2 className={styles.stepTitle}>Validação SMS</h2>
+        <h2 className={styles.stepTitle}>Valide seu formato de contato.</h2>
         <p className={styles.stepDescription}>
-          Digite o código de 6 dígitos enviado para seu telefone.
+          Digite o código enviado por SMS para o número:
+        </p>
+        <p className={styles.stepPhoneNumber}>
+          (31) 9 9999-9999
         </p>
       </div>
       <div className={styles.stepContent}>
         <Input
           {...register('smsCode')}
-          label="Código SMS"
+          label="Código de ativação"
           maxLength={6}
           errorMessage={errors.smsCode?.message as string || errors.general?.message as string}
           required
@@ -38,16 +39,16 @@ const Step2_SmsValidation: React.FC<Step2SmsValidationProps> = ({
         />
         <Button
           type="button"
-          variant="ghost"
+          variant="linkMuted"
           size="sm"
           onClick={handleResendSms}
           disabled={resendCooldown > 0 || isSubmitting}
         >
-          {resendCooldown > 0 ? `Reenviar em ${resendCooldown}s` : 'Reenviar código'}
+          {resendCooldown > 0 ? `Reenviar código (${resendCooldown}seg)` : 'Reenviar código (30seg)'}
         </Button>
       </div>
     </div>
   );
 };
 
-export default Step2_SmsValidation;
+export default StepTwoSmsValidation;

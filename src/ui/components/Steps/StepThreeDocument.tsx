@@ -6,11 +6,11 @@ import { Button } from '../Button/Button';
 import { Label } from '../Label/Label';
 import styles from './Steps.module.css';
 
-interface Step3DocumentProps {
+interface StepThreeDocumentProps {
   documentType: 'cpf' | 'cnpj' | 'both';
 }
 
-const Step3_Document: React.FC<Step3DocumentProps> = ({ documentType }) => {
+const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) => {
   const { register, watch, setValue, formState: { errors } } = useFormContext();
   const selectedDocumentType = watch('documentType');
   const isBillOwner = watch('isBillOwner');
@@ -47,8 +47,9 @@ const Step3_Document: React.FC<Step3DocumentProps> = ({ documentType }) => {
   return (
     <div className={styles.stepContainer}>
       <div className={styles.stepHeader}>
-        <h2 className={styles.stepTitle}>Seus Documentos</h2>
-        <p className={styles.stepDescription}>Onde você quer economizar energia?</p>
+        <h2 className={styles.stepTitle}>Preencha os dados da conta de luz.</h2>
+        <p className={styles.stepDescription}>Em caso de dúvidas, clique aqui.</p>
+        <p className={styles.stepQuestion}>A conta de luz está em seu nome? *</p>
       </div>
 
       <div className={styles.stepContent}>
@@ -61,15 +62,16 @@ const Step3_Document: React.FC<Step3DocumentProps> = ({ documentType }) => {
 
         {selectedDocumentType === 'cpf' && (
           <>
-            <Input {...register('myCpf')} label="Meu CPF" placeholder="000.000.000-00" errorMessage={errors.myCpf?.message as string} fullWidth />
-
             <div className={styles.radioGroup}>
-              <p>A conta de luz está em seu nome?*</p>
-              <div>
+              <div className={styles.radioOption}>
                 <Button type="button" variant={isBillOwner === true ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(true)}>Sim</Button>
                 <Button type="button" variant={isBillOwner === false ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(false)}>Não</Button>
               </div>
               {errors.isBillOwner && <p className={styles.errorMessage}>{errors.isBillOwner.message as string}</p>}
+            </div>
+
+            <div className={styles.inputMyCpfContainer}>
+              <Input {...register('myCpf')} label="Meu CPF *" placeholder="000.000.000-00" errorMessage={errors.myCpf?.message as string} fullWidth />
             </div>
 
             {isBillOwner === false && (
@@ -100,4 +102,4 @@ const Step3_Document: React.FC<Step3DocumentProps> = ({ documentType }) => {
   );
 };
 
-export default Step3_Document;
+export default StepThreeDocument;

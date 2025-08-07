@@ -7,8 +7,8 @@ import { Button } from './components/Button/Button'
 import styles from './DefaultAdhesionForm.module.css'
 
 import StepOnePersonalData from './components/Steps/StepOnePersonalData'
-import Step2_SmsValidation from './components/Steps/Step2_SmsValidation'
-import Step3_Document from './components/Steps/Step3_Document'
+import StepTwoSmsValidation from './components/Steps/StepTwoSmsValidation'
+import StepThreeDocument from './components/Steps/StepThreeDocument'
 import Step4_Contract from './components/Steps/Step4_Contract'
 import Step5_Complete from './components/Steps/Step5_Complete'
 import { StepIndicator } from './components/StepIndicator/StepIndicator'
@@ -46,17 +46,18 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
-        return <StepOnePersonalData />;
+        // return <StepOnePersonalData />;
+        return <StepThreeDocument documentType={flowConfig?.documentType || 'both'} />;
       case 2:
         return (
-          <Step2_SmsValidation
+          <StepTwoSmsValidation
             handleResendSms={handleResendSms}
             resendCooldown={resendCooldown}
             isSubmitting={isSubmitting}
           />
         );
       case 3:
-        return <Step3_Document documentType={flowConfig?.documentType || 'both'} />;
+        return <StepThreeDocument documentType={flowConfig?.documentType || 'both'} />;
       case 4:
         return <Step4_Contract />;
       case 5:

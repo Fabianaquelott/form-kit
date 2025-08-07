@@ -26,45 +26,49 @@
   outline-offset: 2px;
 }
 
-/* Variantes */
 .primary {
-  background-color: var(--color-primary-600);
-  color: var(--color-white);
+  border-radius: 8px;
+  border: 2px solid #08068D;
+  background: #FFF;
 }
+
 .primary:hover:not(:disabled) {
-  background-color: var(--color-primary-700);
 }
 
 .secondary {
   background-color: var(--color-secondary-100);
   color: var(--color-secondary-900);
 }
+
 .secondary:hover:not(:disabled) {
   background-color: var(--color-secondary-200);
 }
+
 .secondary:active:not(:disabled) {
   background-color: var(--color-secondary-300);
 }
 
 .outline {
-  background-color: transparent;
-  color: var(--color-primary-600);
-  border: 1px solid var(--color-primary-600);
+  border-radius: 8px;
+  border: 1px solid #C2CCD6;
+  background: #FFF;
 }
+
 .outline:hover:not(:disabled) {
-  background-color: var(--color-primary-50);
 }
+
 .outline:active:not(:disabled) {
-  background-color: var(--color-primary-100);
 }
 
 .ghost {
   background-color: transparent;
   color: var(--color-secondary-700);
 }
+
 .ghost:hover:not(:disabled) {
   background-color: var(--color-secondary-100);
 }
+
 .ghost:active:not(:disabled) {
   background-color: var(--color-secondary-200);
 }
@@ -73,9 +77,11 @@
   background-color: var(--color-error-600);
   color: var(--color-white);
 }
+
 .danger:hover:not(:disabled) {
   background-color: var(--color-error-700);
 }
+
 .danger:active:not(:disabled) {
   background-color: var(--color-error-800);
 }
@@ -88,9 +94,14 @@
 }
 
 .md {
-  padding: var(--space-3) var(--space-4);
-  font-size: var(--text-base);
-  min-height: 2.5rem;
+  display: flex;
+  width: 236px;
+  height: 44px;
+  padding: 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .lg {
@@ -144,4 +155,37 @@
 .button:focus-visible {
   outline: 2px solid var(--color-primary-500);
   outline-offset: 2px;
+}
+
+.linkMuted {
+  color: var(--Primary-Azul-Universo-700, #08068D);
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0.24px;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
+  justify-content: flex-start;
+}
+
+.linkMuted:disabled {
+  color: var(--GrayScale-300, #A4B3C1);
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0.24px;
+  text-decoration-line: underline;
+  text-decoration-style: solid;
+  text-decoration-skip-ink: none;
+  text-decoration-thickness: auto;
+  text-underline-offset: auto;
+  text-underline-position: from-font;
 }
