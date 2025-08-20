@@ -78,6 +78,8 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
               <>
                 {dontKnowBillOwnerCpf ? (
                   <div>
+                    <p className={styles.titleFileInput}>Conta de luz atual *</p>
+                    <hr className={styles.lineFileInput}></hr>
                     <FileButtonInput
                       {...register('billFile')}
                       ref={fileRef}
@@ -85,7 +87,7 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
                       accept="image/*,application/pdf"
                       errorMessage={errors.billFile?.message as string}
                       fullWidth
-                    />
+                      />
                   </div>
                 ) : (
                   <div style={{ marginTop: '10px' }}>

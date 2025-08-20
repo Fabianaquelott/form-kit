@@ -92,7 +92,7 @@
   gap: 8px;
 }
 
-.radioOption{
+.radioOption {
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -189,8 +189,24 @@
   letter-spacing: 0.1em;
 }
 
-.inputMyCpfContainer{
+.inputMyCpfContainer {
   margin-top: 16px;
+}
+
+
+.titleFileInput {
+  color: var(--GrayScale-600, #536679);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0.24px;
+  margin-bottom: 16px;
+}
+
+.lineFileInput {
+  margin-bottom: 12px;
+  border-top: 1px solid var(--GrayScale-200, #C2CCD6);
 }
 
 @keyframes fadeIn {
