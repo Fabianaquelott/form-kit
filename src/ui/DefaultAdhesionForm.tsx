@@ -1,5 +1,3 @@
-// src/ui/DefaultAdhesionForm.tsx
-
 import React from 'react'
 import { FormProvider } from 'react-hook-form'
 import { useAdhesionForm, FlowConfig } from '@/core'

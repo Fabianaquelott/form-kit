@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Label } from '../Label/Label';
 import CustomScrollbar from '../ScrollBar/CustomScrollbar';
 import styles from './StepFour.module.css';
 
