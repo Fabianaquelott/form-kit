@@ -4,12 +4,11 @@ import React from 'react'
 import { FormProvider } from 'react-hook-form'
 import { useAdhesionForm, FlowConfig } from '@/core'
 import { Button } from './components/Button/Button'
-import styles from './DefaultAdhesionForm.module.css'
-
 import StepOnePersonalData from './components/Steps/StepOnePersonalData'
 import StepTwoSmsValidation from './components/Steps/StepTwoSmsValidation'
+import styles from './DefaultAdhesionForm.module.css'
 import StepThreeDocument from './components/Steps/StepThreeDocument'
-import Step4_Contract from './components/Steps/Step4_Contract'
+import StepFourContract from './components/Steps/StepFourContract'
 import Step5_Complete from './components/Steps/Step5_Complete'
 import { StepIndicator } from './components/StepIndicator/StepIndicator'
 
@@ -46,8 +45,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
-        // return <StepOnePersonalData />;
-        return <StepThreeDocument documentType={flowConfig?.documentType || 'both'} />;
+        return <StepOnePersonalData />;
       case 2:
         return (
           <StepTwoSmsValidation
@@ -59,7 +57,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
       case 3:
         return <StepThreeDocument documentType={flowConfig?.documentType || 'both'} />;
       case 4:
-        return <Step4_Contract />;
+        return <StepFourContract />;
       case 5:
         return <Step5_Complete referralCoupon={referralCoupon} />;
       default:

@@ -1,0 +1,50 @@
+.wrapper {
+  position: relative;
+  width: 100%;
+  height: var(--csb-height, 314px); /* controla altura fixa */
+}
+
+/* viewport ocupa a altura fixa */
+.viewport {
+  overflow: auto;
+  height: 100%; /* mesma altura do wrapper */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  padding-right: 48px;
+}
+.viewport::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* track ocupa a altura fixa também */
+.track {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%; /* mesma altura do wrapper */
+  width: var(--csb-thickness, 8px);
+  background: #d3dde7;
+  border-radius: 9999px;
+  display: flex;
+  justify-content: center;
+}
+
+/* thumb */
+.thumb {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  background: #08068D;
+  border-radius: 9999px;
+  cursor: grab;
+}
+.thumb:active {
+  cursor: grabbing;
+}
+
+
+/* evita seleção de texto durante o drag */
+:global(body.no-select) {
+  user-select: none;
+}
