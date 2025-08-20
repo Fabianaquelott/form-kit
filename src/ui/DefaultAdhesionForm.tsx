@@ -43,7 +43,15 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
-        return <StepOnePersonalData />;
+        // return <StepOnePersonalData />;
+        // return (
+        //   <StepTwoSmsValidation
+        //     handleResendSms={handleResendSms}
+        //     resendCooldown={resendCooldown}
+        //     isSubmitting={isSubmitting}
+        //   />
+        // );
+         return <StepThreeDocument documentType={flowConfig?.documentType || 'both'} />;
       case 2:
         return (
           <StepTwoSmsValidation

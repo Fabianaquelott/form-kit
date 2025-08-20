@@ -28,7 +28,6 @@
   font-family: 'Inter', sans-serif;
   align-items: center;
   justify-content: center;
-
 }
 
 .connector {
@@ -51,4 +50,35 @@
 
 .connectorActive {
   background-color: var(--color-gray-400);
+}
+
+@media (max-width: 576px) {
+  .wrapper {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .logo {
+    height: 32px;
+  }
+
+  .steps {
+    margin-top: 15px;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .step {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    line-height: 14px;
+  }
+
+  .connector {
+    width: 32px;
+    height: 3px;
+    margin: 0 4px;
+  }
 }

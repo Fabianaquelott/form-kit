@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form';
 import formStyles from '../../DefaultAdhesionForm.module.css'; // Importando estilos compartilhados
 import { Input } from '../Input/Input';
 import { Label } from '../Label/Label';
-import styles from './Steps.module.css';
+import styles from './StepOnePersonalData.module.css';
 
 const Step1_PersonalData: React.FC = () => {
   const { register, watch, formState: { errors } } = useFormContext();
@@ -16,7 +16,8 @@ const Step1_PersonalData: React.FC = () => {
       <div className={styles.stepHeader}>
         <p className={styles.stepTitle}>Sua conta de <p>luz <span className={styles.stepTitleBold}>mais leve.</span></p></p>
         <p className={styles.stepDescription}>
-          Junte-se a mais de 50 mil famílias e garanta até <p>15% de desconto no consumo de sua conta de luz</p> <p className={styles.stepDescriptionBold}>de forma simples e digital.</p>
+          Junte-se a mais de 50 mil famílias e garanta até 15% de desconto no consumo de sua conta de luz{' '}
+          <span className={styles.stepDescriptionBold}>de forma simples e digital.</span>
         </p>
       </div>
       <div className={styles.stepContent}>
@@ -38,7 +39,7 @@ const Step1_PersonalData: React.FC = () => {
         <Input
           {...register('phone')}
           type="tel"
-          label="Telefone"
+          label="Número de celular"
           errorMessage={errors.phone?.message as string}
           required
           fullWidth
@@ -58,18 +59,16 @@ const Step1_PersonalData: React.FC = () => {
             {errors.emailConfirmed && <div className={formStyles.errorMessage}>{errors.emailConfirmed.message as string}</div>}
           </div>
         )}
-
-        <div className={formStyles.checkboxContainer}>
-          <input
-            {...register('termsAccepted')}
-            type="checkbox"
-            id="terms"
-            className={formStyles.checkbox}
-          />
-          <Label htmlFor="terms" className={formStyles.checkboxLabel}>
-            Li e concordo com os <a href="#" className={formStyles.link}>termos e condições</a>.
-          </Label>
-          {errors.termsAccepted && <div className={formStyles.errorMessage}>{errors.termsAccepted.message as string}</div>}
+        <div>
+          <p className={styles.policyText}>
+            Ao submeter minhas respostas e clicar{' '}
+            <span className={styles.policyTextBold}>“Quero economizar”, </span>
+            concordo com a{' '}
+            <a href="/politica-de-privacidade" className={styles.policyTextLink}>
+              Política de Privacidade
+            </a>{' '}
+            da Bulbe energia.
+          </p>
         </div>
       </div>
     </div>

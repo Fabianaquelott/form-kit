@@ -1,10 +1,11 @@
 // src/ui/components/Steps/Step3_Document.tsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Input } from '../Input/Input';
 import { Button } from '../Button/Button';
-import { Label } from '../Label/Label';
-import styles from './Steps.module.css';
+import { FileButtonInput, FileButtonInputRef } from '../Input/FileInput';
+import { Input } from '../Input/Input';
+import { Toggle } from '../Toggle/Toggle';
+import styles from './StepThreeDocument.module.css';
 
 interface StepThreeDocumentProps {
   documentType: 'cpf' | 'cnpj' | 'both';
@@ -12,6 +13,8 @@ interface StepThreeDocumentProps {
 
 const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) => {
   const { register, watch, setValue, formState: { errors } } = useFormContext();
+  const fileRef = useRef<FileButtonInputRef>(null);
+
   const selectedDocumentType = watch('documentType');
   const isBillOwner = watch('isBillOwner');
   const dontKnowBillOwnerCpf = watch('dontKnowBillOwnerCpf');
@@ -39,10 +42,6 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
     setValue('isBillOwner', isOwner, { shouldValidate: true });
   };
 
-  const handleKnowCpfToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValue('dontKnowBillOwnerCpf', event.target.checked, { shouldValidate: true });
-  };
-
 
   return (
     <div className={styles.stepContainer}>
@@ -51,44 +50,58 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
         <p className={styles.stepDescription}>Em caso de dúvidas, clique aqui.</p>
         <p className={styles.stepQuestion}>A conta de luz está em seu nome? *</p>
       </div>
-
+      <div className={styles.radioGroup}>
+        <div className={styles.radioOption}>
+          <Button type="button" variant={isBillOwner === true ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(true)}>Sim</Button>
+          <Button type="button" variant={isBillOwner === false ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(false)}>Não</Button>
+        </div>
+        {errors.isBillOwner && <p className={styles.errorMessage}>{errors.isBillOwner.message as string}</p>}
+      </div>
       <div className={styles.stepContent}>
+
         {documentType === 'both' && (
           <div className={styles.buttonGroup}>
             <Button type="button" variant={selectedDocumentType === 'cpf' ? 'primary' : 'outline'} onClick={() => handleSelectType('cpf')} fullWidth>Casa (CPF)</Button>
             <Button type="button" variant={selectedDocumentType === 'cnpj' ? 'primary' : 'outline'} onClick={() => handleSelectType('cnpj')} fullWidth>Empresa (CNPJ)</Button>
           </div>
         )}
-
         {selectedDocumentType === 'cpf' && (
           <>
-            <div className={styles.radioGroup}>
-              <div className={styles.radioOption}>
-                <Button type="button" variant={isBillOwner === true ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(true)}>Sim</Button>
-                <Button type="button" variant={isBillOwner === false ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(false)}>Não</Button>
-              </div>
-              {errors.isBillOwner && <p className={styles.errorMessage}>{errors.isBillOwner.message as string}</p>}
-            </div>
+            {dontKnowBillOwnerCpf === false && isBillOwner === true &&
 
-            <div className={styles.inputMyCpfContainer}>
-              <Input {...register('myCpf')} label="Meu CPF *" placeholder="000.000.000-00" errorMessage={errors.myCpf?.message as string} fullWidth />
-            </div>
+              <div className={styles.inputMyCpfContainer}>
+                <Input {...register('myCpf')} label="Meu CPF *" placeholder="000.000.000-00" errorMessage={errors.myCpf?.message as string} fullWidth />
+              </div>
+            }
 
             {isBillOwner === false && (
               <>
-                <div className={styles.checkboxContainer}>
-                  <input type="checkbox" {...register('dontKnowBillOwnerCpf')} id="dontKnowCpf" onChange={handleKnowCpfToggle} />
-                  <Label htmlFor="dontKnowCpf">Não sei o CPF do titular da conta.</Label>
-                </div>
-
                 {dontKnowBillOwnerCpf ? (
                   <div>
-                    <Label htmlFor="billFile">Envie a conta de luz*</Label>
-                    <Input id="billFile" type="file" {...register('billFile')} accept="image/*,application/pdf" errorMessage={errors.billFile?.message as string} />
+                    <FileButtonInput
+                      {...register('billFile')}
+                      ref={fileRef}
+                      buttonText="Enviar conta de luz"
+                      accept="image/*,application/pdf"
+                      errorMessage={errors.billFile?.message as string}
+                      fullWidth
+                    />
                   </div>
                 ) : (
-                  <Input {...register('billOwnerCpf')} label="CPF do titular da conta de luz" placeholder="000.000.000-00" errorMessage={errors.billOwnerCpf?.message as string} fullWidth />
+                  <div style={{ marginTop: '10px' }}>
+                    <Input {...register('billOwnerCpf')} label="CPF do titular da conta de luz" placeholder="000.000.000-00" errorMessage={errors.billOwnerCpf?.message as string} fullWidth />
+                  </div>
                 )}
+                <div className={styles.toggleContainer}>
+                  <Toggle
+                    id="dontKnowCpf"
+                    checked={dontKnowBillOwnerCpf || false}
+                    onChange={(checked) => setValue('dontKnowBillOwnerCpf', checked, { shouldValidate: true })}
+                    label="Não sei o CPF do titular da conta."
+                    onColor="#08068D"
+                    offColor="#ccc"
+                  />
+                </div>
               </>
             )}
           </>

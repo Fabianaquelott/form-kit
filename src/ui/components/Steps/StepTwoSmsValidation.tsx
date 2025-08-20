@@ -2,7 +2,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Input } from '../Input/Input';
 import { Button } from '../Button/Button';
-import styles from './Steps.module.css';
+import styles from './StepTwoSmsValidation.module.css';
 
 interface StepTwoSmsValidationProps {
   handleResendSms: () => void;
