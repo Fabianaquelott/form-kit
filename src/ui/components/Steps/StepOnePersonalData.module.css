@@ -95,7 +95,6 @@
   }
 }
 
-/* ===== MOBILE ===== */
 @media(max-width: 576px) {
   .stepContainer {
     gap: 30px;

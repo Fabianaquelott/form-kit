@@ -1,13 +1,11 @@
-// src/ui/components/Steps/Step1_PersonalData.tsx
-
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import formStyles from '../../DefaultAdhesionForm.module.css'; // Importando estilos compartilhados
 import { Input } from '../Input/Input';
 import { Label } from '../Label/Label';
+import formStyles from '../../DefaultAdhesionForm.module.css';
 import styles from './StepOnePersonalData.module.css';
 
-const Step1_PersonalData: React.FC = () => {
+const StepOnePersonalData: React.FC = () => {
   const { register, watch, formState: { errors } } = useFormContext();
   const isEmailConfirmationRequired = watch('isEmailConfirmationRequired');
 
@@ -69,10 +67,15 @@ const Step1_PersonalData: React.FC = () => {
             </a>{' '}
             da Bulbe energia.
           </p>
+          <input
+            {...register('termsAccepted')}
+            type="hidden"
+            value="true"
+          />
         </div>
       </div>
     </div>
   );
 };
 
-export default Step1_PersonalData;
+export default StepOnePersonalData;

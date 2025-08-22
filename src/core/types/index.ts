@@ -47,7 +47,6 @@ export interface Contact {
 }
 
 export interface AdhesionFormData {
-  // Etapa 1
   name: string
   email: string
   phone: string
@@ -60,10 +59,8 @@ export interface AdhesionFormData {
   contact?: Contact
   attempt?: number
 
-  // Etapa 2
   smsCode?: string
 
-  // Etapa 3
   documentType?: 'cpf' | 'cnpj'
   myCpf?: string
   isBillOwner?: boolean
@@ -72,11 +69,9 @@ export interface AdhesionFormData {
   billFile?: FileList | null
   cnpj?: string
 
-  // Etapa 4
   coupon?: string
   termsAcceptedStep4?: boolean
 
-  // Etapa 5
   referralCoupon?: string
 }
 

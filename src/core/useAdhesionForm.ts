@@ -70,9 +70,13 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
 
   const form = useForm<AdhesionFormSchema>({
     resolver: zodResolver(stepSchemas[currentStep as keyof typeof stepSchemas]),
-    defaultValues: formDataFromStore,
-    mode: 'onBlur',
+    defaultValues: {
+      ...formDataFromStore,
+      termsAccepted: true,
+    },
+    mode: 'onChange',
   })
+
 
   useEffect(() => {
     const subscription = form.watch((value: Partial<AdhesionFormData>) => {

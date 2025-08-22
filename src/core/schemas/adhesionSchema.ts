@@ -1,11 +1,7 @@
-// src/core/schemas/adhesionSchema.ts
-
 import { z } from 'zod'
 
-// --- Funções Utilitárias de Validação ---
 const NAME_REGEX = /^[a-zA-Z\u00C0-\u017F´`~^. ]+$/
 
-// Regex ajustada para validar apenas celulares com 9 dígitos (iniciando com 9).
 const BRAZILIAN_PHONE_REGEX = /^(?:\(?([0-9]{2})\)?\s?)?(?:(9\d{4})-?(\d{4}))$/
 
 const hasAllSameDigits = (doc: string) =>
@@ -28,8 +24,6 @@ const isValidCPF = (cpf: string) => {
   if (remainder === 10 || remainder === 11) remainder = 0
   return remainder === parseInt(cleanCpf.substring(10, 11))
 }
-
-// --- Schemas por Etapa ---
 
 const basePersonalDataSchema = z.object({
   name: z
@@ -143,21 +137,17 @@ export const contractSchema = z.object({
   }),
 })
 
-// --- Schema Completo e Tipos ---
-
 export const adhesionFormSchema = basePersonalDataSchema
   .merge(smsValidationSchema.partial())
   .merge(baseDocumentSchema.partial())
   .merge(contractSchema.partial())
 
-// Tipos inferidos
 export type PersonalDataForm = z.infer<typeof personalDataSchema>
 export type SmsValidationForm = z.infer<typeof smsValidationSchema>
 export type DocumentForm = z.infer<typeof documentSchema>
 export type ContractForm = z.infer<typeof contractSchema>
 export type AdhesionFormSchema = z.infer<typeof adhesionFormSchema>
 
-// Schemas por etapa
 export const stepSchemas = {
   1: personalDataSchema,
   2: smsValidationSchema,

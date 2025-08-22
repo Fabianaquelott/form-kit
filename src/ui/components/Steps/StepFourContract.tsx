@@ -1,11 +1,8 @@
 import React, { useRef } from 'react';
-import { useFormContext } from 'react-hook-form';
 import CustomScrollbar from '../ScrollBar/CustomScrollbar';
 import styles from './StepFour.module.css';
 
 const StepFourContract: React.FC = () => {
-  const { register, formState: { errors } } = useFormContext()
-
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
 
