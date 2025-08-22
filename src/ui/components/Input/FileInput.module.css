@@ -32,8 +32,18 @@
   background-color: #060470;
 }
 
-.icon {
-  display: inline-block;
+.iconCamera {
+  display: flex;
+  width: 20px;
+  height: 24px;
+  fill: currentColor;
+}
+
+.iconTrash {
+  display: flex;
+  width: 16px;
+  height: 22px;
+  fill: currentColor;
 }
 
 .errorMessage {
@@ -48,17 +58,29 @@
 .fileInfo {
   display: flex;
   align-items: center;
+  font-style: normal;
+  letter-spacing: 0.28px;
+  line-height: 140%;
+  text-decoration-line: underline;
+  font-weight: 400;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 16px 12px;
   border-radius: 8px;
 }
 
 .fileName {
   font-size: 14px;
-  color: #111827;
+  color: #08068D;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.fileNameContainer{
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
 }
 
 .clearButton {
@@ -69,4 +91,10 @@
   cursor: pointer;
   padding: 0;
   margin-left: 8px;
+}
+
+@media (max-width: 640px) {
+  .fileInfo{
+      padding: 16px 0px;
+  }
 }

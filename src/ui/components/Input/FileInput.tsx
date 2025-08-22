@@ -1,6 +1,9 @@
 import React, { forwardRef, useState, useImperativeHandle } from 'react';
-import styles from './FileInput.module.css';
+import CameraIcon from '../../../assets/camera-icon.svg';
+import TrashIcon from '../../../assets/trash-icon.svg';
+import PaperIcon from '../../../assets/paper-icon.svg';
 import { Label } from '../Label/Label';
+import styles from './FileInput.module.css';
 
 interface FileButtonInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -26,6 +29,8 @@ export const FileButtonInput = forwardRef<FileButtonInputRef, FileButtonInputPro
         if (inputRef.current) {
           inputRef.current.value = '';
           setFileName(null);
+          const event = { target: { files: null } } as unknown as React.ChangeEvent<HTMLInputElement>;
+          props.onChange?.(event);
         }
       },
     }));
@@ -36,15 +41,18 @@ export const FileButtonInput = forwardRef<FileButtonInputRef, FileButtonInputPro
       } else {
         setFileName(null);
       }
-
-      // Chama o onChange externo se existir (ex: react-hook-form)
-      props.onChange && props.onChange(e);
+      props.onChange?.(e);
     };
 
     const handleClear = () => {
       if (inputRef.current) {
         inputRef.current.value = '';
         setFileName(null);
+        props.onChange?.({
+          target: {
+            files: undefined
+          }
+        } as unknown as React.ChangeEvent<HTMLInputElement>);
       }
     };
 
@@ -54,13 +62,19 @@ export const FileButtonInput = forwardRef<FileButtonInputRef, FileButtonInputPro
 
         {!fileName ? (
           <label htmlFor={inputId} className={styles.button}>
-            {buttonText} <span className={styles.icon}>📷</span>
+            {buttonText}
+            <span className={styles.iconCamera}>
+              <img src={CameraIcon} alt='Ícone de câmera' className={styles.icon} />
+            </span>
           </label>
         ) : (
           <div className={styles.fileInfo}>
-            <span className={styles.fileName}>{fileName}</span>
+            <div className={styles.fileNameContainer}>
+              <span><img src={PaperIcon} /></span>
+              <span className={styles.fileName}>{fileName}</span>
+            </div>
             <button type="button" className={styles.clearButton} onClick={handleClear}>
-              ✖
+              <span className={styles.iconTrash}><img src={TrashIcon} /></span>
             </button>
           </div>
         )}

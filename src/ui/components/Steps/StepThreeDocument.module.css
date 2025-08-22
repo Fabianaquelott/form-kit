@@ -1,7 +1,6 @@
 .stepContainer {
   display: flex;
   flex-direction: column;
-  gap: 10px;
   animation: fadeIn 0.5s ease-in-out;
 }
 
@@ -9,7 +8,6 @@
   margin-top: 32px;
   text-align: center;
   display: flex;
-  gap: 16px;
   flex-direction: column;
 }
 
@@ -41,6 +39,7 @@
   font-weight: 400;
   line-height: 20px;
   text-align: justify;
+  margin-bottom: 16px;
 }
 
 .stepDescriptionBold {
@@ -72,7 +71,16 @@
   font-weight: 600;
   line-height: 150%;
   letter-spacing: 0.28px;
+  margin-bottom: 8px;
   text-align: justify;
+}
+
+.containerInputOwnerCpf {
+  margin-top: 32px;
+}
+
+.inputFileContainer {
+  margin-top: 32px;
 }
 
 .stepContent {
@@ -89,7 +97,6 @@
 .radioGroup {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .radioOption {
@@ -100,7 +107,7 @@
 }
 
 .radioGroup p {
-  margin: 0 0 var(--space-1) 0;
+  margin: 0 0 8px 0;
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
   color: var(--color-gray-700);
@@ -201,12 +208,16 @@
   font-weight: 600;
   line-height: 140%;
   letter-spacing: 0.24px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
 }
 
 .lineFileInput {
-  margin-bottom: 12px;
+  margin-top: 16px;
   border-top: 1px solid var(--GrayScale-200, #C2CCD6);
+}
+
+.start {
+  color: #DC2626;
 }
 
 @keyframes fadeIn {
@@ -222,6 +233,26 @@
 }
 
 @media (max-width: 640px) {
+  .stepTitle {
+    color: #08068D;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 30px;
+    margin-bottom: 16px;
+    text-align: justify;
+  }
+
+  .stepQuestion {
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    text-align: justify;
+    margin-top: 16px;
+  }
+
   .buttonGroup {
     grid-template-columns: 1fr;
   }
@@ -233,5 +264,17 @@
   .couponCode {
     font-size: var(--text-base);
     padding: var(--space-2) var(--space-4);
+  }
+
+  .titleFileInput {
+    margin-bottom: 8px;
+  }
+
+  .toggleContainer {
+    margin-top: 14px;
+  }
+
+  .lineFileInput {
+    margin-bottom: 0px;
   }
 }
