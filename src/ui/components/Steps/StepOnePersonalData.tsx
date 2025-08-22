@@ -22,6 +22,7 @@ const StepOnePersonalData: React.FC = () => {
         <Input
           {...register('name')}
           label="Nome completo"
+          placeholder="Nome e sobrenome"
           errorMessage={errors.name?.message as string}
           required
           fullWidth
@@ -30,6 +31,7 @@ const StepOnePersonalData: React.FC = () => {
           {...register('email')}
           type="email"
           label="E-mail"
+          placeholder="exemplo@email.com"
           errorMessage={errors.email?.message as string}
           required
           fullWidth
@@ -38,10 +40,13 @@ const StepOnePersonalData: React.FC = () => {
           {...register('phone')}
           type="tel"
           label="Número de celular"
+          mask="(99) 99999-9999"
+          placeholder="(00) 9 0000-0000"
           errorMessage={errors.phone?.message as string}
           required
           fullWidth
         />
+
 
         {isEmailConfirmationRequired && (
           <div className={`${formStyles.checkboxContainer} ${formStyles.warningBox}`}>

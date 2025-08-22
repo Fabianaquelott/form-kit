@@ -9,6 +9,7 @@ import StepThreeDocument from './components/Steps/StepThreeDocument'
 import StepFourContract from './components/Steps/StepFourContract'
 import Step5_Complete from './components/Steps/Step5_Complete'
 import { StepIndicator } from './components/StepIndicator/StepIndicator'
+import { StepNavigationButtons } from './components/StepNavigationButtons/StepNavigationButtons'
 
 export interface DefaultAdhesionFormProps {
   flowConfig?: FlowConfig;
@@ -75,18 +76,14 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
                 {errors.general}
               </div>
             )}
-            {currentStep < 5 && (
-              <div className={styles.navigation}>
-                {navigation.canGoPrevious && (
-                  <Button type="button" variant="outline" onClick={navigation.previousStep} disabled={isSubmitting}>
-                    Voltar
-                  </Button>
-                )}
-                <Button type="submit" isLoading={isSubmitting} disabled={!formMethods.form.formState.isValid}>
-                  {navigation.isLastStep ? 'Finalizar' : 'Concluir'}
-                </Button>
-              </div>
-            )}
+            <StepNavigationButtons
+              currentStep={currentStep}
+              canGoPrevious={navigation.canGoPrevious}
+              isLastStep={navigation.isLastStep}
+              isSubmitting={isSubmitting}
+              isValid={formMethods.form.formState.isValid}
+              onPrevious={navigation.previousStep}
+            />
           </form>
         </FormProvider>
       </div>

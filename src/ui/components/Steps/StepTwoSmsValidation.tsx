@@ -35,6 +35,7 @@ const StepTwoSmsValidation: React.FC<StepTwoSmsValidationProps> = ({
           maxLength={6}
           errorMessage={errors.smsCode?.message as string || errors.general?.message as string}
           required
+          placeholder="- - - - - -"
           fullWidth
         />
         <Button
