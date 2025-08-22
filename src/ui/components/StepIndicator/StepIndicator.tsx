@@ -17,15 +17,17 @@ export const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep, total
         {steps.map((step, index) => (
           <React.Fragment key={step}>
             <div
-              className={`${styles.step} ${currentStep + 1 === step ? styles.active : ''} ${
-                step <= currentStep ? styles.done : ''
-              }`}
+              className={`${styles.step} ${
+                currentStep + 1 === step ? styles.active : ''
+              } ${step <= currentStep ? styles.done : ''}`}
             >
               {step}
             </div>
             {index < totalSteps - 1 && (
               <div
-                className={`${styles.connector} ${step <= currentStep ? styles.connectorActive : ''}`}
+                className={`${styles.connector} ${
+                  step <= currentStep ? styles.connectorActive : ''
+                }`}
               />
             )}
           </React.Fragment>
