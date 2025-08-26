@@ -1,8 +1,8 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
+import formStyles from '../../DefaultAdhesionForm.module.css';
 import { Input } from '../Input/Input';
 import { Label } from '../Label/Label';
-import formStyles from '../../DefaultAdhesionForm.module.css';
 import styles from './StepOnePersonalData.module.css';
 
 const StepOnePersonalData: React.FC = () => {
@@ -30,6 +30,7 @@ const StepOnePersonalData: React.FC = () => {
           errorMessage={errors.name?.message as string}
           required
           fullWidth
+          aria-label='Nome completo'
         />
 
         <Input
@@ -40,6 +41,7 @@ const StepOnePersonalData: React.FC = () => {
           errorMessage={errors.email?.message as string}
           required
           fullWidth
+          aria-label='E-mail'
         />
 
         <Input
@@ -51,6 +53,7 @@ const StepOnePersonalData: React.FC = () => {
           errorMessage={errors.phone?.message as string}
           required
           fullWidth
+          aria-label='Número de celular'
         />
 
         {isEmailConfirmationRequired && (
@@ -60,6 +63,7 @@ const StepOnePersonalData: React.FC = () => {
               type="checkbox"
               id="emailConfirmed"
               className={formStyles.checkbox}
+              aria-label='Confirmação de e-mail'
             />
             <Label htmlFor="emailConfirmed" className={formStyles.checkboxLabel}>
               Meu e-mail está correto.
@@ -72,7 +76,7 @@ const StepOnePersonalData: React.FC = () => {
           </div>
         )}
 
-        <div>
+        <div aria-label='Política de Privacidade'>
           <p className={styles.policyText}>
             Ao submeter minhas respostas e clicar{' '}
             <span className={styles.policyTextBold}>“Quero economizar”, </span>
