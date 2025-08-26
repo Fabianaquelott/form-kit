@@ -45,9 +45,8 @@ export const StepNavigationButtons: React.FC<StepNavigationButtonsProps> = ({
                     type="button"
                     onClick={onPrevious}
                     disabled={isSubmitting}
-                    className={styles.secondaryButtonLeft}
-                >
-                    <div className={styles.containerButtonLeft}>
+                    className={styles.secondaryButtonLeft}>
+                    <div aria-label="Botão voltar" className={styles.containerButtonLeft}>
                         <img src={ArrowRight} alt="" className={`${styles.arrowIcon} ${styles.arrowLeft}`} />
                         <span>Voltar</span>
                     </div>
@@ -57,9 +56,8 @@ export const StepNavigationButtons: React.FC<StepNavigationButtonsProps> = ({
                 type="submit"
                 isLoading={isSubmitting}
                 disabled={!isValid}
-                className={!isFirstStep ? styles.secondaryButtonRight : styles.firstStepButton}
-            >
-                <div className={!isFirstStep ? styles.containerButtonRight : styles.containerFirstStepButton}>
+                className={!isFirstStep ? styles.secondaryButtonRight : styles.firstStepButton}>
+                <div arial-label={`Botão ${getButtonLabel()}`} className={!isFirstStep ? styles.containerButtonRight : styles.containerFirstStepButton}>
                     <span>{getButtonLabel()}</span>
                     {!isFirstStep && <img src={ArrowRight} alt="" className={styles.arrowIcon} />}
                 </div>
