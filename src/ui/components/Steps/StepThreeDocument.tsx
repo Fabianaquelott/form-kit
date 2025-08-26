@@ -58,8 +58,9 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
           <div style={{ marginBottom: '32px' }}>
             <p className={styles.stepQuestion}>Onde quer economizar? <span className={styles.start}>*</span></p>
             <div className={styles.radioOption}>
-              <Button type="button" variant={selectedDocumentType === 'cpf' ? 'primary' : 'outline'} onClick={() => handleSelectType('cpf')} >Casa</Button>
-              <Button type="button" variant={selectedDocumentType === 'cnpj' ? 'primary' : 'outline'} onClick={() => handleSelectType('cnpj')} >Empresa</Button>
+              <Button aria-label="Botão para selecionar casa" type="button" variant={selectedDocumentType === 'cpf' ? 'primary' : 'outline'} onClick={() => handleSelectType('cpf')} >Casa</Button>
+              <Button aria-label="Botão para selecionar empresa"
+                type="button" variant={selectedDocumentType === 'cnpj' ? 'primary' : 'outline'} onClick={() => handleSelectType('cnpj')} >Empresa</Button>
             </div>
           </div>
         )}
@@ -67,8 +68,8 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
           <>
             <p className={styles.stepQuestion}>A conta de luz está em seu nome? <span className={styles.start}>*</span></p>
             <div className={styles.radioOption}>
-              <Button type="button" variant={isBillOwner === true ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(true)}>Sim</Button>
-              <Button type="button" variant={isBillOwner === false ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(false)}>Não</Button>
+              <Button aria-label="Botão sim para caso a conta de luz estiver no nome do cadastrante" type="button" variant={isBillOwner === true ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(true)}>Sim</Button>
+              <Button aria-label="Botão não para caso a conta de luz não esteja no nome do cadastrante" type="button" variant={isBillOwner === false ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(false)}>Não</Button>
             </div>
             {errors.isBillOwner && <p className={styles.errorMessage}>{errors.isBillOwner.message as string}</p>}
           </>
@@ -81,7 +82,7 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
             {dontKnowBillOwnerCpf === false && isBillOwner === true &&
 
               <div className={styles.inputMyCpfContainer}>
-                <Input {...register('myCpf')} label="Meu CPF *" placeholder="000.000.000-00" errorMessage={errors.myCpf?.message as string} fullWidth />
+                <Input aria-label="Inserir cpf do cadastrante" {...register('myCpf')} label="Meu CPF *" placeholder="000.000.000-00" errorMessage={errors.myCpf?.message as string} fullWidth />
               </div>
             }
 
@@ -93,6 +94,7 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
                     {billFile && billFile.length > 0 && <hr className={styles.lineFileInput} />}
                     <FileButtonInput
                       {...register('billFile')}
+                      aria-label="Botão para enviar conta de luz"
                       ref={fileRef}
                       buttonText="Enviar conta de luz"
                       accept="image/*,application/pdf"
@@ -105,11 +107,12 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
                   </div>
                 ) : (
                   <div className={styles.containerInputOwnerCpf}>
-                    <Input {...register('billOwnerCpf')} label="CPF do titular da conta de luz" placeholder="000.000.000-00" errorMessage={errors.billOwnerCpf?.message as string} fullWidth />
+                    <Input aria-label="Inserir cpf do titular da conta" {...register('billOwnerCpf')} label="CPF do titular da conta de luz" placeholder="000.000.000-00" errorMessage={errors.billOwnerCpf?.message as string} fullWidth />
                   </div>
                 )}
                 <div className={styles.toggleContainer}>
                   <Toggle
+                    aria-label="Alternar para não sei o cpf do titular da conta"
                     id="dontKnowCpf"
                     checked={dontKnowBillOwnerCpf || false}
                     onChange={(checked) => setValue('dontKnowBillOwnerCpf', checked, { shouldValidate: true })}
@@ -123,7 +126,7 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
           </>
         )}
         {selectedDocumentType === 'cnpj' && (
-          <Input {...register('cnpj')} label="CNPJ do titular da conta de luz" placeholder="00.000.000/0000-00" errorMessage={errors.cnpj?.message as string} fullWidth />
+          <Input aria-label="Inserir CNPJ do titular da conta" {...register('cnpj')} label="CNPJ do titular da conta de luz" placeholder="00.000.000/0000-00" errorMessage={errors.cnpj?.message as string} fullWidth />
         )}
       </div>
     </div>
