@@ -86,26 +86,6 @@
   gap: var(--space-3);
 }
 
-.radioGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.radioOption{
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
-.radioGroup p {
-  margin: 0 0 var(--space-1) 0;
-  font-size: var(--text-sm);
-  font-weight: var(--font-medium);
-  color: var(--color-gray-700);
-}
-
 .checkboxContainer {
   display: flex;
   align-items: center;
@@ -200,7 +180,7 @@
   letter-spacing: 0.1em;
 }
 
-.inputMyCpfContainer{
+.inputMyCpfContainer {
   margin-top: 16px;
 }
 

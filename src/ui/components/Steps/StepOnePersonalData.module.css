@@ -83,6 +83,12 @@
   text-decoration-line: underline;
 }
 
+.blockText {
+  display: block; /* joga tudo dentro pra baixo */
+  margin-top: 2px; /* opcional, espaço extra */
+}
+
+
 @keyframes fadeIn {
   from {
     opacity: 0;

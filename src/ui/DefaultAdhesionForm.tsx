@@ -51,6 +51,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
             handleResendSms={handleResendSms}
             resendCooldown={resendCooldown}
             isSubmitting={isSubmitting}
+            phoneNumber={formMethods.form.getValues('phone')}
           />
         );
       case 3:

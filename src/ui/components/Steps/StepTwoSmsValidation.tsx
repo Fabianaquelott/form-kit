@@ -8,12 +8,14 @@ interface StepTwoSmsValidationProps {
   handleResendSms: () => void;
   resendCooldown: number;
   isSubmitting: boolean;
+  phoneNumber: string;
 }
 
 const StepTwoSmsValidation: React.FC<StepTwoSmsValidationProps> = ({
   handleResendSms,
   resendCooldown,
-  isSubmitting
+  isSubmitting,
+  phoneNumber
 }) => {
   const { register, formState: { errors } } = useFormContext();
 
@@ -25,7 +27,7 @@ const StepTwoSmsValidation: React.FC<StepTwoSmsValidationProps> = ({
           Digite o código enviado por SMS para o número:
         </p>
         <p className={styles.stepPhoneNumber}>
-          (31) 9 9999-9999
+          {phoneNumber}
         </p>
       </div>
       <div className={styles.stepContent}>

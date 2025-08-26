@@ -12,12 +12,16 @@ const StepOnePersonalData: React.FC = () => {
   return (
     <div className={styles.stepContainer}>
       <div className={styles.stepHeader}>
-        <p className={styles.stepTitle}>Sua conta de <p>luz <span className={styles.stepTitleBold}>mais leve.</span></p></p>
+        <h1 className={styles.stepTitle}>
+          Sua conta de luz<br />
+          <span className={styles.stepTitleBold}>mais leve.</span>
+        </h1>
         <p className={styles.stepDescription}>
           Junte-se a mais de 50 mil famílias e garanta até 15% de desconto no consumo de sua conta de luz{' '}
           <span className={styles.stepDescriptionBold}>de forma simples e digital.</span>
         </p>
       </div>
+
       <div className={styles.stepContent}>
         <Input
           {...register('name')}
@@ -27,6 +31,7 @@ const StepOnePersonalData: React.FC = () => {
           required
           fullWidth
         />
+
         <Input
           {...register('email')}
           type="email"
@@ -36,6 +41,7 @@ const StepOnePersonalData: React.FC = () => {
           required
           fullWidth
         />
+
         <Input
           {...register('phone')}
           type="tel"
@@ -46,7 +52,6 @@ const StepOnePersonalData: React.FC = () => {
           required
           fullWidth
         />
-
 
         {isEmailConfirmationRequired && (
           <div className={`${formStyles.checkboxContainer} ${formStyles.warningBox}`}>
@@ -59,24 +64,27 @@ const StepOnePersonalData: React.FC = () => {
             <Label htmlFor="emailConfirmed" className={formStyles.checkboxLabel}>
               Meu e-mail está correto.
             </Label>
-            {errors.emailConfirmed && <div className={formStyles.errorMessage}>{errors.emailConfirmed.message as string}</div>}
+            {errors.emailConfirmed && (
+              <div className={formStyles.errorMessage}>
+                {errors.emailConfirmed.message as string}
+              </div>
+            )}
           </div>
         )}
+
         <div>
           <p className={styles.policyText}>
             Ao submeter minhas respostas e clicar{' '}
             <span className={styles.policyTextBold}>“Quero economizar”, </span>
             concordo com a{' '}
-            <a href="/politica-de-privacidade" className={styles.policyTextLink}>
-              Política de Privacidade
-            </a>{' '}
-            da Bulbe energia.
+            <span className={styles.blockText}>
+              <a href="/politica-de-privacidade" className={styles.policyTextLink}>
+                Política de Privacidade
+              </a>{' '}
+              da Bulbe energia.
+            </span>
           </p>
-          <input
-            {...register('termsAccepted')}
-            type="hidden"
-            value="true"
-          />
+          <input {...register('termsAccepted')} type="hidden" value="true" />
         </div>
       </div>
     </div>
