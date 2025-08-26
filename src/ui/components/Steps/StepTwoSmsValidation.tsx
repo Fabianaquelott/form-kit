@@ -39,6 +39,7 @@ const StepTwoSmsValidation: React.FC<StepTwoSmsValidationProps> = ({
           required
           placeholder="- - - - - -"
           fullWidth
+          aria-label="Código de ativação"
         />
         <Button
           type="button"
@@ -46,6 +47,7 @@ const StepTwoSmsValidation: React.FC<StepTwoSmsValidationProps> = ({
           size="sm"
           onClick={handleResendSms}
           disabled={resendCooldown > 0 || isSubmitting}
+          aria-label="Reenviar código de ativação por SMS"
         >
           {resendCooldown > 0 ? `Reenviar código (${resendCooldown}seg)` : 'Reenviar código (30seg)'}
         </Button>
