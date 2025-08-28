@@ -150,17 +150,19 @@ async function processNewUser(
       createDealResponse.error || 'Falha ao criar o negócio associado.'
     )
   }
-  const smsPayload = {
-    contact_id: contactId,
-    resend: true,
-    phone: payload.phone,
-  }
-  const sendSmsResponse = await apiRequest('/v2/generate-code-sms', {
-    method: 'PATCH',
-    body: JSON.stringify(smsPayload),
-  })
-  if (!sendSmsResponse.success) {
-    throw new Error(sendSmsResponse.error || 'Falha ao enviar o código SMS.')
+  if (payload.requiresSms !== false) {
+    const smsPayload = {
+      contact_id: contactId,
+      resend: true,
+      phone: payload.phone,
+    }
+    const sendSmsResponse = await apiRequest('/v2/generate-code-sms', {
+      method: 'PATCH',
+      body: JSON.stringify(smsPayload),
+    })
+    if (!sendSmsResponse.success) {
+      throw new Error(sendSmsResponse.error || 'Falha ao enviar o código SMS.')
+    }
   }
   return { ...createContactResponse, deal: createDealResponse }
 }
@@ -168,7 +170,7 @@ async function processNewUser(
 // --- Funções Exportadas ---
 
 export async function handleStep1Submission(
-  payload: CreateContactPayload
+  payload: CreateContactPayload & { requiresSms?: boolean }
 ): Promise<ApiResponse<any>> {
   return processNewUser(payload)
 }
