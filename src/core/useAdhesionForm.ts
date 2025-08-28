@@ -209,7 +209,11 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       }
 
       try {
-        const result = await handleStep1Submission(payload)
+        const result = await handleStep1Submission({
+          ...payload,
+          requiresSms: flowConfig?.requiresSms !== false, 
+        })
+
         if (result.success) {
           updateFormData({
             ...data,
@@ -217,7 +221,12 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
             dealId: result.deal?.deal_id,
             attempt: 1,
           })
-          navigation.nextStep()
+
+          if (flowConfig?.requiresSms === false) {
+            navigation.goToStep(3)
+          } else {
+            navigation.nextStep() 
+          }
 
           trackUserCreated()
 
@@ -258,6 +267,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       navigation,
       setErrors,
       onSubmitError,
+      flowConfig,
     ]
   )
 

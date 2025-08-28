@@ -5,6 +5,7 @@ import { FlowConfig } from '@/core';
 
 const noSmsFlowConfig: FlowConfig = {
   steps: [1, 3, 4, 5],
+  requiresSms: false,
 };
 
 export const NoSmsAdhesionForm: React.FC<DefaultAdhesionFormProps> = (props) => {

@@ -6,7 +6,8 @@ export type FlowStep = 1 | 2 | 3 | 4 | 5
 
 export interface FlowConfig {
   steps: FlowStep[]
-  documentType?: 'cpf' | 'cnpj'
+  documentType?: 'cpf' | 'cnpj',
+  requiresSms?: boolean
 }
 
 export interface UrlParams {
@@ -106,7 +107,7 @@ export interface AdhesionFormState {
   steps: FlowStep[]
   data: Partial<AdhesionFormData>
   isSubmitting: boolean
-  errors: { general?: string; [key: string]: any }
+  errors: { general?: string;[key: string]: any }
 }
 
 export interface FormNavigationState {

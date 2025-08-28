@@ -1,5 +1,3 @@
-// src/core/hooks/useFormNavigation.ts
-
 import { useMemo } from 'react'
 import type { FormNavigationState, FlowStep } from '../types'
 import { useFormStore } from '../state/formStore'
