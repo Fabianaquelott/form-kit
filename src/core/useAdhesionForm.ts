@@ -211,7 +211,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
       try {
         const result = await handleStep1Submission({
           ...payload,
-          requiresSms: flowConfig?.requiresSms !== false, 
+          requiresSms: flowConfig?.requiresSms !== false,
         })
 
         if (result.success) {
@@ -223,9 +223,9 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
           })
 
           if (flowConfig?.requiresSms === false) {
-            navigation.goToStep(3)
+            navigation.nextStep();
           } else {
-            navigation.nextStep() 
+            navigation.nextStep()
           }
 
           trackUserCreated()
