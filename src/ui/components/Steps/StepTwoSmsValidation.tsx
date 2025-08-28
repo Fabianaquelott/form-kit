@@ -38,6 +38,7 @@ const StepTwoSmsValidation: React.FC<StepTwoSmsValidationProps> = ({
           errorMessage={errors.smsCode?.message as string || errors.general?.message as string}
           required
           placeholder="- - - - - -"
+          type='token'
           fullWidth
           aria-label="Código de ativação"
         />
