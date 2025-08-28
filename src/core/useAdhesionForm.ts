@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useFormStore } from './state/formStore'
+import { trackPageView, trackUserCreated, trackStep2Success } from '../core/utils/metrics-service'
 import { useFormNavigation } from './hooks/useFormNavigation'
 import { stepSchemas, type AdhesionFormSchema } from './schemas/adhesionSchema'
 import {
@@ -217,6 +218,8 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
             attempt: 1,
           })
           navigation.nextStep()
+
+          trackUserCreated()
 
         } else {
           if (result.code === 'user_already_exist') {

@@ -1,6 +1,6 @@
-// src/playground/App.tsx
+import React, { useEffect, useState } from 'react';
+import { trackPageView } from '../core/utils/metrics-service';
 
-import React, { useState } from 'react';
 import {
   DefaultAdhesionForm,
   CpfOnlyAdhesionForm,
@@ -31,8 +31,13 @@ const formTitles: Record<FormVariant, string> = {
 };
 
 
+
 function App() {
   const [activeForm, setActiveForm] = useState<FormVariant>('default');
+
+  useEffect(() => {
+    trackPageView();
+  }, []);
 
   const resetFormState = useFormStore((state: FormStore) => state.resetForm);
 
