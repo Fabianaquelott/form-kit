@@ -1,15 +1,14 @@
+import { FlowConfig, useAdhesionForm } from '@/core'
 import React from 'react'
 import { FormProvider } from 'react-hook-form'
-import { useAdhesionForm, FlowConfig } from '@/core'
-import { Button } from './components/Button/Button'
-import StepOnePersonalData from './components/Steps/StepOnePersonalData'
-import StepTwoSmsValidation from './components/Steps/StepTwoSmsValidation'
-import styles from './DefaultAdhesionForm.module.css'
-import StepThreeDocument from './components/Steps/StepThreeDocument'
-import StepFourContract from './components/Steps/StepFourContract'
-import Step5_Complete from './components/Steps/Step5_Complete'
 import { StepIndicator } from './components/StepIndicator/StepIndicator'
 import { StepNavigationButtons } from './components/StepNavigationButtons/StepNavigationButtons'
+import StepFiveComplete from './components/Steps/StepFiveComplete'
+import StepFourContract from './components/Steps/StepFourContract'
+import StepOnePersonalData from './components/Steps/StepOnePersonalData'
+import StepThreeDocument from './components/Steps/StepThreeDocument'
+import StepTwoSmsValidation from './components/Steps/StepTwoSmsValidation'
+import styles from './DefaultAdhesionForm.module.css'
 
 export interface DefaultAdhesionFormProps {
   flowConfig?: FlowConfig;
@@ -59,7 +58,7 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
       case 4:
         return <StepFourContract />;
       case 5:
-        return <Step5_Complete referralCoupon={referralCoupon} />;
+        return <StepFiveComplete referralCoupon={referralCoupon} />;
       default:
         return <div>Etapa não encontrada</div>;
     }

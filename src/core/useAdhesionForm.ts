@@ -138,6 +138,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
     onSubmitError?.(errorMessage)
   }
 
+
   const handleExistingUser = useCallback(
     async (email: string) => {
       const userResponse = await getUserByEmail(email)
@@ -216,6 +217,7 @@ export const useAdhesionForm = (options: UseAdhesionFormOptions = {}) => {
             attempt: 1,
           })
           navigation.nextStep()
+
         } else {
           if (result.code === 'user_already_exist') {
             await handleExistingUser(data.email!)

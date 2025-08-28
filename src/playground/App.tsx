@@ -38,7 +38,6 @@ function App() {
 
   const handleSuccess = (data: any) => {
     console.log(`✅ Sucesso no fluxo "${formTitles[activeForm]}":`, data);
-    alert('Sucesso! Veja o console.');
   };
 
   const handleError = (error: string) => {

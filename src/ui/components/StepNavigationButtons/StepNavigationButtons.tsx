@@ -37,10 +37,9 @@ export const StepNavigationButtons: React.FC<StepNavigationButtonsProps> = ({
     };
 
     const isFirstStep = currentStep === 1;
-
     return (
         <div className={styles.navigation}>
-            {canGoPrevious && currentStep !== 1 && (
+            {canGoPrevious && currentStep !== 1 && currentStep !== 3 && (
                 <Button
                     type="button"
                     onClick={onPrevious}

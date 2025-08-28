@@ -152,14 +152,13 @@ async function processNewUser(
   }
   const smsPayload = {
     contact_id: contactId,
-    resend: false,
+    resend: true,
     phone: payload.phone,
   }
   const sendSmsResponse = await apiRequest('/v2/generate-code-sms', {
     method: 'PATCH',
     body: JSON.stringify(smsPayload),
   })
-
   if (!sendSmsResponse.success) {
     throw new Error(sendSmsResponse.error || 'Falha ao enviar o código SMS.')
   }
@@ -231,9 +230,8 @@ export async function submitDocuments(payload: {
   const updateDealPayload: Partial<Deal> = {
     deal_id: payload.dealId,
     contact_id: payload.contactId,
-    deal_name: `${
-      payload.contactName
-    } - ${payload.document.type.toUpperCase()}: ${payload.document.value}`,
+    deal_name: `${payload.contactName
+      } - ${payload.document.type.toUpperCase()}: ${payload.document.value}`,
     [payload.document.type]: payload.document.value,
     natureza_juridica:
       payload.document.type === 'cpf' ? 'Pessoa Física' : 'Pessoa Jurídica',

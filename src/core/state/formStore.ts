@@ -1,5 +1,3 @@
-// src/core/state/formStore.ts
-
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import type { AdhesionFormState, AdhesionFormData, FlowStep } from '../types'

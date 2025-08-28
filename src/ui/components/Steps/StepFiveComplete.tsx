@@ -4,11 +4,11 @@ import React from 'react';
 import styles from './Steps.module.css';
 import { Button } from '../Button/Button';
 
-interface Step5CompleteProps {
+interface StepFiveCompleteProps {
   referralCoupon: string | null;
 }
 
-const Step5_Complete: React.FC<Step5CompleteProps> = ({ referralCoupon }) => {
+const StepFiveComplete: React.FC<StepFiveCompleteProps> = ({ referralCoupon }) => {
 
   const handleShare = () => {
     const text = `Sabia que você pode economizar até 15% no consumo da sua conta de luz? ⚡ A Bulbe é a solução perfeita para quem busca economia, sem obras ou burocracia. Acesse o link e garanta essa oferta: https://assine.bulbeenergia.com.br/?cupom=${referralCoupon}`;
@@ -38,4 +38,4 @@ const Step5_Complete: React.FC<Step5CompleteProps> = ({ referralCoupon }) => {
   );
 };
 
-export default Step5_Complete;
+export default StepFiveComplete;

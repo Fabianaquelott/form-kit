@@ -1,9 +1,17 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { useFormContext } from 'react-hook-form';
 import CustomScrollbar from '../ScrollBar/CustomScrollbar';
 import styles from './StepFour.module.css';
 
 const StepFourContract: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const { register, formState: { errors } } = useFormContext()
+  const { setValue } = useFormContext();
+
+  useEffect(() => {
+    setValue('termsAcceptedStep4', true);
+  }, [setValue]);
+
 
   return (
     <div className={styles.stepContainer}>

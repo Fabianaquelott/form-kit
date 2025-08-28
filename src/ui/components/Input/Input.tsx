@@ -31,7 +31,7 @@ export interface InputProps
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   fullWidth?: boolean;
-  mask?: string; // Permite passar a máscara customizada
+  mask?: string; 
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -57,7 +57,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const hasError = !!errorMessage;
     const inputState = hasError ? 'error' : state;
 
-    // Máscara padrão para telefone (celular com 9 dígitos)
     const defaultMask = '(99) 99999-9999';
 
     const inputClassName = `${inputVariants({ size, state: inputState })} ${className || ''}`;
