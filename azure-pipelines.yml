@@ -1,0 +1,24 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '20.x'
+  displayName: 'Instalar Node.js'
+
+- script: npm ci
+  displayName: 'Instalar dependências'
+
+- script: npm run build
+  displayName: 'Build da lib'
+
+- script: |
+    echo "//bulbe.visualstudio.com/Site%20Bulbe/_packaging/bulbe-form-kit/npm/registry/:_authToken=$(System.AccessToken)" > .npmrc
+    npm publish --registry=https://bulbe.visualstudio.com/Site%20Bulbe/_packaging/bulbe-form-kit/npm/registry/
+  displayName: 'Publicar no Azure Artifacts'
+  env:
+    NPM_TOKEN: $(System.AccessToken)
