@@ -5,20 +5,24 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+# 1. Instala Node.js
 - task: NodeTool@0
   inputs:
     versionSpec: '20.x'
   displayName: 'Instalar Node.js'
 
+# 2. Instala dependências
 - script: npm ci
   displayName: 'Instalar dependências'
 
+# 3. Build da lib usando tsconfig.build.json
 - script: npm run build
   displayName: 'Build da lib'
 
+# 4. Autentica no feed e publica
 - script: |
     echo "//bulbe.visualstudio.com/Site%20Bulbe/_packaging/bulbe-form-kit/npm/registry/:_authToken=$(System.AccessToken)" > .npmrc
-    npm publish --registry=https://bulbe.visualstudio.com/Site%20Bulbe/_packaging/bulbe-form-kit/npm/registry/
+    npm run publish:azure
   displayName: 'Publicar no Azure Artifacts'
   env:
     NPM_TOKEN: $(System.AccessToken)
