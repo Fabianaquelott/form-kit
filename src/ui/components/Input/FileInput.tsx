@@ -21,7 +21,10 @@ export const FileButtonInput = forwardRef<FileButtonInputRef, FileButtonInputPro
   ({ label, buttonText = 'Enviar arquivo', errorMessage, fullWidth, id, ...props }, ref) => {
     const inputId = id || `file-input-${Math.random().toString(36).substr(2, 9)}`;
     const [fileName, setFileName] = useState<string | null>(null);
+    const [internalError, setInternalError] = useState<string | null>(null);
     const inputRef = React.useRef<HTMLInputElement>(null);
+
+    const allowedTypes = ['image/svg+xml', 'image/png', 'image/jpeg', 'application/pdf', 'image/webp'];
 
     useImperativeHandle(ref, () => ({
       input: inputRef.current,
@@ -29,6 +32,7 @@ export const FileButtonInput = forwardRef<FileButtonInputRef, FileButtonInputPro
         if (inputRef.current) {
           inputRef.current.value = '';
           setFileName(null);
+          setInternalError(null);
           const event = { target: { files: null } } as unknown as React.ChangeEvent<HTMLInputElement>;
           props.onChange?.(event);
         }
@@ -36,8 +40,16 @@ export const FileButtonInput = forwardRef<FileButtonInputRef, FileButtonInputPro
     }));
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInternalError(null); 
       if (e.target.files && e.target.files[0]) {
-        setFileName(e.target.files[0].name);
+        const file = e.target.files[0];
+        if (!allowedTypes.includes(file.type)) {
+          setInternalError('Tipo de arquivo não permitido. Use .svg, .png, .jpeg, .jpg, .pdf ou .webp.');
+          if (inputRef.current) inputRef.current.value = '';
+          setFileName(null);
+          return;
+        }
+        setFileName(file.name);
       } else {
         setFileName(null);
       }
@@ -48,10 +60,9 @@ export const FileButtonInput = forwardRef<FileButtonInputRef, FileButtonInputPro
       if (inputRef.current) {
         inputRef.current.value = '';
         setFileName(null);
+        setInternalError(null);
         props.onChange?.({
-          target: {
-            files: undefined
-          }
+          target: { files: undefined }
         } as unknown as React.ChangeEvent<HTMLInputElement>);
       }
     };
@@ -83,12 +94,15 @@ export const FileButtonInput = forwardRef<FileButtonInputRef, FileButtonInputPro
           id={inputId}
           type="file"
           ref={inputRef}
+          accept=".svg,.png,.jpeg,.jpg,.pdf,.webp"
           {...props}
           className={styles.hiddenInput}
           onChange={handleChange}
         />
 
-        {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>}
+        {(internalError || errorMessage) && (
+          <div className={styles.errorMessage}>{internalError || errorMessage}</div>
+        )}
       </div>
     );
   }
