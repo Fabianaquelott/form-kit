@@ -1,6 +1,6 @@
 {
   "name": "@bulbe/adhesion-form-lib",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Biblioteca de componentes e lógica para formulários de adesão",
   "type": "module",
   "main": "./dist/index.cjs",
