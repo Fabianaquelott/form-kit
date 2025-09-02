@@ -1,0 +1,107 @@
+.stepContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.stepHeader {
+  margin-top: 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.stepTitle {
+  color: var(--Primary-Azul-Universo-700, #08068D);
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 30px;
+  text-align: justify;
+}
+
+.stepDescription {
+  color: var(--GrayScale-600, #536679);
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: justify;
+}
+
+.adhesionTitle {
+  color: var(--Primary-Azul-Universo-700, #08068D);
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.4px;
+}
+
+.adhesionSubtitle {
+  color: var(--GrayScale-600, #536679);
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 150%;
+  letter-spacing: 0.24px;
+}
+
+.container {
+  position: relative;
+  width: 504px;
+  height: 250px;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  color: #536679;
+  background: white;
+  margin-top: 16px;
+  line-height: 150%;
+  letter-spacing: 0.24px;
+  font-style: normal;
+  text-align: justify;
+}
+
+.buttonDown {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #132e87;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.buttonDown:hover {
+  background-color: #0a1a4f;
+}
+
+@media (max-width: 640px) {
+  .container {
+    max-width: 300px;
+  }
+
+  .stepTitle {
+    font-size: 18px;
+    letter-spacing: 0.3px;
+    max-width: 300px;
+    margin-bottom: 16px;
+  }
+
+  .stepDescription {
+    max-width: 300px;
+  }
+}

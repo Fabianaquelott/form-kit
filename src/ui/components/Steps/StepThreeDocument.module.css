@@ -1,0 +1,281 @@
+.stepContainer {
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.stepHeader {
+  margin-top: 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.stepTitle {
+  color: #08068D;
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 30px;
+  text-align: justify;
+}
+
+.stepTitleBold {
+  color: var(--Primary-Azul-Universo-700, #08068D);
+  font-family: Inter;
+  font-size: 54px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 72px;
+  letter-spacing: -1.08px;
+}
+
+.stepDescription {
+  color: var(--GrayScale-600, #536679);
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: justify;
+  margin-bottom: 16px;
+}
+
+.stepDescriptionBold {
+  color: var(--GrayScale-600, #536679);
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 30px;
+}
+
+.stepPhoneNumber {
+  margin-top: 10px;
+  color: #000;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  text-align: justify;
+  letter-spacing: 0.32px;
+}
+
+.stepQuestion {
+  color: var(--GrayScale-600, #536679);
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.28px;
+  margin-bottom: 8px;
+  text-align: justify;
+}
+
+.containerInputOwnerCpf {
+  margin-top: 32px;
+}
+
+.inputFileContainer {
+  margin-top: 32px;
+}
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.buttonGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.radioOption {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.radioGroup p {
+  margin: 0 0 8px 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-gray-700);
+}
+
+.toggleContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: 17px;
+}
+
+.link {
+  color: var(--color-primary-600);
+  text-decoration: underline;
+  font-weight: var(--font-medium);
+}
+
+.link:hover {
+  color: var(--color-primary-700);
+}
+
+.errorMessage {
+  font-size: var(--text-xs);
+  color: var(--color-error-600);
+}
+
+.warningBox {
+  padding: var(--space-3);
+  background-color: var(--color-warning-50);
+  border: 1px solid var(--color-warning-200);
+  border-radius: var(--radius-md);
+}
+
+.termsBox {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: var(--space-4);
+  background-color: var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.termsBox p {
+  margin-bottom: var(--space-3);
+}
+
+.termsBox p:last-child {
+  margin-bottom: 0;
+}
+
+.referralBox {
+  text-align: center;
+  padding: var(--space-6);
+  background: linear-gradient(135deg, var(--color-primary-50), var(--color-secondary-50));
+  border: 1px solid var(--color-primary-200);
+  border-radius: var(--radius-xl);
+}
+
+.referralBox h3 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-primary-700);
+  margin-bottom: var(--space-2);
+}
+
+.referralBox p {
+  font-size: var(--text-sm);
+  color: var(--color-gray-600);
+  margin-bottom: var(--space-4);
+  line-height: var(--leading-relaxed);
+}
+
+.couponCode {
+  display: inline-block;
+  padding: var(--space-3) var(--space-6);
+  background-color: var(--color-primary-600);
+  color: var(--color-white);
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  letter-spacing: 0.1em;
+}
+
+.inputMyCpfContainer {
+  margin-top: 16px;
+}
+
+
+.titleFileInput {
+  color: var(--GrayScale-600, #536679);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0.24px;
+  margin-bottom: 8px;
+}
+
+.lineFileInput {
+  margin-top: 16px;
+  border-top: 1px solid var(--GrayScale-200, #C2CCD6);
+}
+
+.start {
+  color: #DC2626;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .stepTitle {
+    color: #08068D;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 30px;
+    margin-bottom: 16px;
+    text-align: justify;
+  }
+
+  .stepQuestion {
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    text-align: justify;
+    margin-top: 16px;
+  }
+
+  .buttonGroup {
+    grid-template-columns: 1fr;
+  }
+
+  .referralBox {
+    padding: var(--space-4);
+  }
+
+  .couponCode {
+    font-size: var(--text-base);
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .titleFileInput {
+    margin-bottom: 8px;
+  }
+
+  .toggleContainer {
+    margin-top: 14px;
+  }
+
+  .lineFileInput {
+    margin-bottom: 0px;
+  }
+}

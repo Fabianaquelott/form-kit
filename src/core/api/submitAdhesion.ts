@@ -1,158 +1,281 @@
-import type { AdhesionFormData, ApiResponse } from '../types'
+import type {
+  ApiResponse,
+  Contact,
+  CreateContactPayload,
+  Deal,
+  AcceptContractPayload,
+} from '../types'
 
-// Configurações da API
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.example.com'
-const API_TIMEOUT = 10000 // 10 segundos
+const API_BASE_URL = '/main-api'
+const API_ERP_BASE_URL = '/erp-api'
+const API_TIMEOUT = 15000
 
-// Função utilitária para requisições HTTP
+const UPLOAD_BILL_PATH = '/HubSpot/UploadFotoContaDeLuz'
+
+// --- Funções Auxiliares ---
+const toBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => resolve((reader.result as string).split(',')[1])
+    reader.onerror = (error) => reject(error)
+  })
+
 async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT)
-  
+  const fullEndpoint = `${API_BASE_URL}${endpoint}`
+
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    const response = await fetch(fullEndpoint, {
       ...options,
       signal: controller.signal,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: { 'Content-Type': 'application/json', ...options.headers },
     })
-    
+
     clearTimeout(timeoutId)
-    
-    const data = await response.json()
-    
+    const responseText = await response.text()
+    const responseData = responseText ? JSON.parse(responseText) : {}
+
     if (!response.ok) {
       return {
         success: false,
-        error: data.message || `HTTP ${response.status}`,
-        data: null,
+        error: responseData.message || `HTTP Error ${response.status}`,
+        ...responseData,
       }
     }
-    
-    return {
-      success: true,
-      data,
-      message: data.message,
-    }
+    return { success: true, ...responseData }
   } catch (error) {
     clearTimeout(timeoutId)
-    
-    if (error instanceof Error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.name === 'AbortError'
+          ? 'Timeout da requisição.'
+          : error.message
+        : 'Ocorreu um erro desconhecido.'
+    return { success: false, error: errorMessage }
+  }
+}
+
+async function apiErpRequest<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<T>> {
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT)
+  const fullEndpoint = `${API_ERP_BASE_URL}${endpoint}`
+
+  try {
+    const response = await fetch(fullEndpoint, {
+      ...options,
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json', ...options.headers },
+    })
+
+    clearTimeout(timeoutId)
+    const responseText = await response.text()
+    const responseData = responseText ? JSON.parse(responseText) : {}
+
+    if (!response.ok) {
       return {
         success: false,
-        error: error.name === 'AbortError' ? 'Timeout na requisição' : error.message,
+        error: responseData.message || `HTTP Error ${response.status}`,
+        ...responseData,
       }
     }
-    
-    return {
-      success: false,
-      error: 'Erro desconhecido na requisição',
-    }
+    return { success: true, ...responseData }
+  } catch (error) {
+    clearTimeout(timeoutId)
+    const errorMessage =
+      error instanceof Error
+        ? error.name === 'AbortError'
+          ? 'Timeout da requisição.'
+          : error.message
+        : 'Ocorreu um erro desconhecido.'
+    return { success: false, error: errorMessage }
   }
 }
 
-// Função para criar contato inicial
-export async function createContact(payload: {
-  name: string
-  email: string
-  phone: string
-}): Promise<ApiResponse<{ contactId: string }>> {
-  console.log('🚀 Criando contato:', payload)
-  
-  // Simular delay da API
-  await new Promise(resolve => setTimeout(resolve, 1500))
-  
-  // Mock response para desenvolvimento
-  if (import.meta.env.NODE_ENV === 'development') {
-    return {
-      success: true,
-      data: { contactId: `contact_${Date.now()}` },
-      message: 'Contato criado com sucesso',
-    }
+async function processNewUser(
+  payload: CreateContactPayload
+): Promise<ApiResponse<any>> {
+  const contactPayload = {
+    firstname: payload.firstname,
+    lastname: payload.lastname,
+    email: payload.email,
+    phone: payload.phone,
+    attempt: payload.attempt,
+    cookies: payload.cookies,
+    utm_campaign: payload.utm_campaign || '',
+    utm_content: payload.utm_content || '',
+    utm_medium: payload.utm_medium || '',
+    utm_source: payload.utm_source || '',
+    utm_term: payload.utm_term || '',
+    hs_facebook_click_id: payload.hs_facebook_click_id || '',
+    hs_google_click_id: payload.hs_google_click_id || '',
+    pf_calculadora__mgm___contactid_de_quem_indicou:
+      payload.pf_calculadora__mgm___contactid_de_quem_indicou || '',
+    interClickRef: payload.interClickRef || '',
   }
-  
-  return apiRequest<{ contactId: string }>('/contacts', {
+
+  const createContactResponse = await apiRequest('/v2/create-contact', {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(contactPayload),
   })
+
+  if (!createContactResponse.success || !createContactResponse.contact_id) {
+    return createContactResponse
+  }
+  const contactId = createContactResponse.contact_id
+
+  const dealPayload = {
+    contact_id: contactId,
+    deal_name: payload.deal_name,
+    utm_campaign: payload.utm_campaign || '',
+    utm_content: payload.utm_content || '',
+    utm_medium: payload.utm_medium || '',
+    utm_source: payload.utm_source || '',
+    utm_term: payload.utm_term || '',
+  }
+  const createDealResponse = await apiRequest('/v2/create-deal', {
+    method: 'POST',
+    body: JSON.stringify(dealPayload),
+  })
+
+  if (!createDealResponse.success) {
+    throw new Error(
+      createDealResponse.error || 'Falha ao criar o negócio associado.'
+    )
+  }
+  if (payload.requiresSms !== false) {
+    const smsPayload = {
+      contact_id: contactId,
+      resend: true,
+      phone: payload.phone,
+    }
+    const sendSmsResponse = await apiRequest('/v2/generate-code-sms', {
+      method: 'PATCH',
+      body: JSON.stringify(smsPayload),
+    })
+    if (!sendSmsResponse.success) {
+      throw new Error(sendSmsResponse.error || 'Falha ao enviar o código SMS.')
+    }
+  }
+  return { ...createContactResponse, deal: createDealResponse }
 }
 
-// Função para validar código SMS
+// --- Funções Exportadas ---
+
+export async function handleStep1Submission(
+  payload: CreateContactPayload & { requiresSms?: boolean }
+): Promise<ApiResponse<any>> {
+  return processNewUser(payload)
+}
+
+export async function getUserByEmail(
+  email: string
+): Promise<ApiResponse<Contact>> {
+  return apiRequest<Contact>(
+    `/get-contact-info?email=${encodeURIComponent(email)}`,
+    { method: 'GET' }
+  )
+}
+
 export async function validateSms(payload: {
   contactId: string
   smsCode: string
-}): Promise<ApiResponse<{ isValid: boolean }>> {
-  console.log('📱 Validando SMS:', payload)
-  
-  // Simular delay da API
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  
-  // Mock response para desenvolvimento
-  if (import.meta.env.NODE_ENV === 'development') {
-    const isValid = payload.smsCode === '123456' // Código mock para desenvolvimento
-    
-    return {
-      success: true,
-      data: { isValid },
-      message: isValid ? 'SMS validado com sucesso' : 'Código SMS inválido',
-    }
-  }
-  
-  return apiRequest<{ isValid: boolean }>('/sms/validate', {
-    method: 'POST',
-    body: JSON.stringify(payload),
+}): Promise<ApiResponse<any>> {
+  return apiRequest<any>('/v2/validate-code-sms', {
+    method: 'PATCH',
+    body: JSON.stringify({
+      contact_id: payload.contactId,
+      code: payload.smsCode,
+    }),
   })
 }
 
-// Função para finalizar adesão
-export async function submitAdhesion(
-  formData: AdhesionFormData
-): Promise<ApiResponse<{ adhesionId: string; status: string }>> {
-  console.log('✅ Finalizando adesão:', formData)
-  
-  // Simular delay da API
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  
-  // Mock response para desenvolvimento
-  if (import.meta.env.NODE_ENV === 'development') {
-    return {
-      success: true,
-      data: {
-        adhesionId: `adhesion_${Date.now()}`,
-        status: 'completed',
+export async function resendSms(payload: {
+  contactId: string
+  phone: string
+}): Promise<ApiResponse<any>> {
+  return apiRequest<any>('/v2/generate-code-sms', {
+    method: 'PATCH',
+    body: JSON.stringify({
+      contact_id: payload.contactId,
+      phone: `+55${payload.phone.replace(/\D/g, '')}`,
+      resend: true,
+    }),
+  })
+}
+
+export async function submitDocuments(payload: {
+  contactId: string
+  dealId: string
+  contactName: string
+  document: { type: 'cpf' | 'cnpj'; value: string }
+}): Promise<ApiResponse<any>> {
+  if (payload.document.type === 'cpf') {
+    const updateCpfPayload = {
+      contact_id: payload.contactId,
+      cpf: payload.document.value,
+    }
+    const updateCpfResponse = await apiRequest('/v2/update-contact-cpf', {
+      method: 'PATCH',
+      body: JSON.stringify(updateCpfPayload),
+    })
+    if (!updateCpfResponse.success) return updateCpfResponse
+  }
+
+  const updateDealPayload: Partial<Deal> = {
+    deal_id: payload.dealId,
+    contact_id: payload.contactId,
+    deal_name: `${payload.contactName
+      } - ${payload.document.type.toUpperCase()}: ${payload.document.value}`,
+    [payload.document.type]: payload.document.value,
+    natureza_juridica:
+      payload.document.type === 'cpf' ? 'Pessoa Física' : 'Pessoa Jurídica',
+  }
+  return await apiRequest('/v2/update-deal', {
+    method: 'PATCH',
+    body: JSON.stringify(updateDealPayload),
+  })
+}
+
+export async function uploadBillFile(payload: {
+  dealId: string
+  file: File
+}): Promise<ApiResponse<any>> {
+  try {
+    const base64String = await toBase64(payload.file)
+
+    const uploadPayload = {
+      hubSpotNegocioId: payload.dealId,
+      payload: {
+        faturaCemigBase64: base64String,
+        extensaoArquivo: payload.file.name.split('.').pop() || '',
       },
-      message: 'Adesão realizada com sucesso!',
+    }
+
+    return apiErpRequest<any>(UPLOAD_BILL_PATH, {
+      method: 'POST',
+      body: JSON.stringify(uploadPayload),
+    })
+  } catch (error: any) {
+    return {
+      success: false,
+      error: 'Falha ao processar o arquivo para upload.',
     }
   }
-  
-  return apiRequest<{ adhesionId: string; status: string }>('/adhesions', {
-    method: 'POST',
-    body: JSON.stringify(formData),
-  })
 }
 
-// Função para reenviar SMS
-export async function resendSms(contactId: string): Promise<ApiResponse<{ sent: boolean }>> {
-  console.log('🔄 Reenviando SMS para:', contactId)
-  
-  // Simular delay da API
-  await new Promise(resolve => setTimeout(resolve, 800))
-  
-  // Mock response para desenvolvimento
-  if (import.meta.env.NODE_ENV === 'development') {
-    return {
-      success: true,
-      data: { sent: true },
-      message: 'SMS reenviado com sucesso',
-    }
-  }
-  
-  return apiRequest<{ sent: boolean }>(`/sms/resend/${contactId}`, {
-    method: 'POST',
+export async function acceptContract(
+  payload: AcceptContractPayload
+): Promise<ApiResponse<any>> {
+  return apiRequest<any>('/accept-contract', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
   })
 }

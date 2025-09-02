@@ -89,7 +89,7 @@ src/
 │   └── types/           # Tipos TypeScript
 └── ui/                  # Componentes de interface
     ├── components/      # Componentes reutilizáveis
-    ├── styles/          # Temas e variáveis SCSS
+    ├── styles/          # Temas e variáveis CSS
     └── DefaultAdhesionForm.tsx
 ```
 

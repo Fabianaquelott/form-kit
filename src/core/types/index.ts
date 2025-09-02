@@ -1,23 +1,113 @@
+// src/core/types/index.ts
+
+import { FieldErrors } from 'react-hook-form'
+
+export type FlowStep = 1 | 2 | 3 | 4 | 5
+
+export interface FlowConfig {
+  steps: FlowStep[]
+  documentType?: 'cpf' | 'cnpj',
+  requiresSms?: boolean
+}
+
+export interface UrlParams {
+  hs_facebook_click_id?: string
+  hs_google_click_id?: string
+  utm_campaign?: string
+  utm_content?: string
+  utm_medium?: string
+  utm_source?: string
+  utm_term?: string
+  [key: string]: any
+}
+
+export interface Deal {
+  id?: string
+  deal_id?: string
+  contact_id?: string
+  deal_name?: string
+  cpf?: string | null
+  cnpj?: string | null
+  natureza_juridica?: string
+  pipeline?: string
+  dealstage?: string
+  utm_source?: string
+  utm_content?: string
+}
+
+export interface Contact {
+  id?: string
+  contact_id?: string
+  email?: string
+  phone?: string
+  firstname?: string
+  lastname?: string
+  aceite_do_termo_de_adesao?: string
+  validacao_do_numero?: string
+  deal?: Deal
+}
+
 export interface AdhesionFormData {
-  // Etapa 1: Dados pessoais
   name: string
   email: string
   phone: string
   termsAccepted: boolean
-  
-  // Etapa 2: Validação SMS (será expandida)
+  isEmailConfirmationRequired?: boolean
+  emailConfirmed?: boolean
+  contactId?: string
+  dealId?: string
+  urlParams?: UrlParams
+  contact?: Contact
+  attempt?: number
+
   smsCode?: string
-  
-  // Etapa 3: Dados adicionais (será expandida)
-  additionalInfo?: Record<string, any>
+
+  documentType?: 'cpf' | 'cnpj'
+  myCpf?: string
+  isBillOwner?: boolean
+  billOwnerCpf?: string
+  dontKnowBillOwnerCpf?: boolean
+  billFile?: FileList | null
+  cnpj?: string
+
+  coupon?: string
+  termsAcceptedStep4?: boolean
+
+  referralCoupon?: string
+}
+
+export interface CreateContactPayload {
+  firstname: string
+  lastname: string
+  email: string
+  phone: string
+  attempt: number
+  utm_campaign?: string
+  utm_content?: string
+  utm_medium?: string
+  utm_source?: string
+  utm_term?: string
+  [key: string]: any
+}
+
+export interface AcceptContractPayload {
+  contact_id: string
+  cupom_indicacao?: string
+  utm_indique_ganhe?: boolean
+  app?: boolean
+}
+
+export type FormErrors = FieldErrors<AdhesionFormData> & {
+  general?: string
 }
 
 export interface AdhesionFormState {
-  currentStep: number
+  currentStep: FlowStep
   totalSteps: number
+  steps: FlowStep[]
   data: Partial<AdhesionFormData>
   isSubmitting: boolean
-  errors: Record<string, string>
+  errors: { general?: string;[key: string]: any }
 }
 
 export interface FormNavigationState {
@@ -25,6 +115,8 @@ export interface FormNavigationState {
   canGoPrevious: boolean
   isFirstStep: boolean
   isLastStep: boolean
+  currentStepIndex: number
+  totalSteps: number
 }
 
 export interface ApiResponse<T = any> {
@@ -32,4 +124,9 @@ export interface ApiResponse<T = any> {
   data?: T
   error?: string
   message?: string
+  info?: string
+  code?: string
+  contact_id?: string
+  contact?: Contact
+  deal?: any
 }

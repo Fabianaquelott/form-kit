@@ -1,31 +1,88 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
+import { trackPageView } from '../core/utils/metrics-service';
 
-import { DefaultAdhesionForm } from '../ui/DefaultAdhesionForm'
-import './App.scss'
+import {
+  DefaultAdhesionForm,
+  CpfOnlyAdhesionForm,
+  CnpjOnlyAdhesionForm,
+  NoSmsAdhesionForm,
+  QuickCaptureAdhesionForm,
+  DefaultAdhesionFormProps
+} from '@/ui';
+import { useFormStore, FormStore } from '@/core';
+import './App.css';
+
+type FormVariant = 'default' | 'cpfOnly' | 'cnpjOnly' | 'noSms' | 'quickCapture';
+
+const formComponents: Record<FormVariant, React.FC<DefaultAdhesionFormProps>> = {
+  default: DefaultAdhesionForm,
+  cpfOnly: CpfOnlyAdhesionForm,
+  cnpjOnly: CnpjOnlyAdhesionForm,
+  noSms: NoSmsAdhesionForm,
+  quickCapture: QuickCaptureAdhesionForm,
+};
+
+const formTitles: Record<FormVariant, string> = {
+  default: 'Fluxo Padrão Completo',
+  cpfOnly: 'Fluxo Apenas CPF',
+  cnpjOnly: 'Fluxo Apenas CNPJ',
+  noSms: 'Fluxo Sem Etapa de SMS',
+  quickCapture: 'Fluxo de Captura Rápida',
+};
+
+
 
 function App() {
+  const [activeForm, setActiveForm] = useState<FormVariant>('default');
+
+  useEffect(() => {
+    trackPageView();
+  }, []);
+
+  const resetFormState = useFormStore((state: FormStore) => state.resetForm);
+
   const handleSuccess = (data: any) => {
-    console.log('🎉 Adesão concluída com sucesso!', data)
-    alert('Adesão realizada com sucesso!')
-  }
+    console.log(`✅ Sucesso no fluxo "${formTitles[activeForm]}":`, data);
+  };
 
   const handleError = (error: string) => {
-    console.error('❌ Erro na adesão:', error)
-  }
+    console.error(`❌ Erro no fluxo "${formTitles[activeForm]}":`, error);
+  };
+
+  const handleVariantChange = (variant: FormVariant) => {
+    resetFormState();
+    setActiveForm(variant);
+  };
+
+  const ActiveFormComponent = formComponents[activeForm];
 
   return (
-    <div className="app">
-      <div className="header">
-        <h1>Adhesion Form Lib - Playground</h1>
-        <p>Ambiente de desenvolvimento para testar a biblioteca</p>
-      </div>
-      
-      <DefaultAdhesionForm
-        onSuccess={handleSuccess}
-        onError={handleError}
-      />
+    <div className="playground-container">
+      <header className="playground-header">
+        <h1>Bulbe Form Kit - Playground</h1>
+        <p>Selecione uma variação do formulário para testar:</p>
+        <nav className="form-selector">
+          {Object.keys(formComponents).map((key) => (
+            <button
+              key={key}
+              className={activeForm === key ? 'active' : ''}
+              onClick={() => handleVariantChange(key as FormVariant)}
+            >
+              {formTitles[key as FormVariant]}
+            </button>
+          ))}
+        </nav>
+      </header>
+
+      <main className="playground-main">
+        <ActiveFormComponent
+          key={activeForm}
+          onSuccess={handleSuccess}
+          onError={handleError}
+        />
+      </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,0 +1,167 @@
+.stepContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.stepHeader {
+  margin-top: 32px;
+  text-align: center;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+}
+
+.stepTitle {
+  color: #08068D;
+  font-size: 54px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 72px;
+  letter-spacing: -1.08px;
+  text-align: justify;
+}
+
+.stepTitleBold {
+  color: var(--Primary-Azul-Universo-700, #08068D);
+  font-size: 54px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 72px;
+  letter-spacing: -1.08px;
+}
+
+.stepDescription {
+  color: var(--GrayScale-600, #536679);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 30px;
+  text-align: justify;
+}
+
+.stepDescriptionBold {
+  color: var(--GrayScale-600, #536679);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 30px;
+}
+
+.stepContent {
+  display: flex;
+  flex-direction: column;
+  gap: 33px;
+}
+
+.policyText {
+  color: var(--GrayScale-600, #536679);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0.24px;
+}
+
+.policyTextBold {
+  color: var(--GrayScale-600, #536679);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0.24px;
+}
+
+.policyTextLink {
+  color: var(--Primary-Azul-Universo-700, #08068D);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0.24px;
+  text-decoration-line: underline;
+}
+
+.blockText {
+  display: block; /* joga tudo dentro pra baixo */
+  margin-top: 2px; /* opcional, espaço extra */
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media(max-width: 576px) {
+  .stepContainer {
+    gap: 30px;
+  }
+
+  .stepTitle {
+    font-size: 36px;
+    font-weight: 300;
+    line-height: 44px;
+    letter-spacing: -0.72px;
+  }
+
+  .stepTitleBold {
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 44px;
+    letter-spacing: -0.72px;
+  }
+
+  .stepDescription {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 22px;
+  }
+
+  .stepDescriptionBold {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+  }
+
+  .stepContent {
+    gap: 33.5px;
+  }
+
+  .policyText {
+    color: var(--GrayScale-600, #536679);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+    letter-spacing: 0.24px;
+  }
+
+  .policyTextBold {
+    color: var(--GrayScale-600, #536679);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 140%;
+    letter-spacing: 0.24px;
+  }
+
+  .policyTextLink {
+    color: var(--Primary-Azul-Universo-700, #08068D);
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 140%;
+    letter-spacing: 0.24px;
+    text-decoration-line: underline;
+  }
+
+}

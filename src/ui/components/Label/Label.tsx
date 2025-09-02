@@ -1,6 +1,6 @@
 import React from 'react'
 
-import styles from './Label.module.scss'
+import styles from './Label.module.css'
 
 export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {
   required?: boolean

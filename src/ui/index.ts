@@ -1,4 +1,5 @@
-// Components
+// src/ui/index.ts
+
 export { Button } from './components/Button/Button'
 export type { ButtonProps } from './components/Button/Button'
 
@@ -11,3 +12,9 @@ export type { LabelProps } from './components/Label/Label'
 // Main form component
 export { DefaultAdhesionForm } from './DefaultAdhesionForm'
 export type { DefaultAdhesionFormProps } from './DefaultAdhesionForm'
+
+// Exportando as novas variações de formulário ---
+export { CpfOnlyAdhesionForm } from './forms/CpfOnlyAdhesionForm'
+export { CnpjOnlyAdhesionForm } from './forms/CnpjOnlyAdhesionForm'
+export { NoSmsAdhesionForm } from './forms/NoSmsAdhesionForm'
+export { QuickCaptureAdhesionForm } from './forms/QuickCaptureAdhesionForm'

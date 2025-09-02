@@ -4,7 +4,7 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     'core/index': 'src/core/index.ts',
-    'ui/index': 'src/ui/index.ts'
+    'ui/index': 'src/ui/index.ts',
   },
   format: ['cjs', 'esm'],
   dts: true,
@@ -16,7 +16,7 @@ export default defineConfig({
   external: ['react', 'react-dom'],
   esbuildOptions(options) {
     options.banner = {
-      js: '"use client";'
+      js: '"use client"',
     }
-  }
+  },
 })
