@@ -1,8 +1,7 @@
+import { cva, type VariantProps } from 'class-variance-authority';
 import React, { forwardRef } from 'react';
 import InputMask from 'react-input-mask';
-import { cva, type VariantProps } from 'class-variance-authority';
 import styles from './Input.module.css';
-import { on } from 'events';
 
 const inputVariants = cva(styles.input, {
   variants: {

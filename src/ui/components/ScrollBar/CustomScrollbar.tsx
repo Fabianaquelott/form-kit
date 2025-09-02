@@ -1,14 +1,10 @@
-// src/components/CustomScrollbar/CustomScrollbar.tsx
 import React, { useEffect, useRef, useState } from "react";
-import styles from "./CustomScrollbar.module.css";
+import styles from "./CustomScrollBar.module.css";
 
 type Props = {
   children: React.ReactNode;
-  /** Altura do viewport (ex.: 320, "50vh", etc.) */
   height?: number | string;
-  /** Largura do trilho/polegar, em px */
   thickness?: number;
-  /** Altura mínima do polegar, em px */
   thumbMinSize?: number;
   className?: string;
 };
@@ -30,7 +26,6 @@ export const CustomScrollbar: React.FC<Props> = ({
     dragging: false,
   });
 
-  // Atualiza tamanho e posição do polegar conforme scroll/resize/conteúdo
   const recalc = () => {
     const vp = viewportRef.current;
     const track = trackRef.current;

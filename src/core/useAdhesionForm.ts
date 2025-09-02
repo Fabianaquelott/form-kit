@@ -1,26 +1,26 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useFormStore } from './state/formStore'
-import { trackPageView, trackUserCreated, trackStep2Success } from '../core/utils/metrics-service'
-import { useFormNavigation } from './hooks/useFormNavigation'
-import { stepSchemas, type AdhesionFormSchema } from './schemas/adhesionSchema'
+import { trackUserCreated } from '../core/utils/metrics-service'
 import {
-  handleStep1Submission,
-  validateSms,
+  acceptContract,
   getUserByEmail,
+  handleStep1Submission,
   resendSms,
   submitDocuments,
   uploadBillFile,
-  acceptContract,
+  validateSms,
 } from './api/submitAdhesion'
+import { useFormNavigation } from './hooks/useFormNavigation'
+import { stepSchemas, type AdhesionFormSchema } from './schemas/adhesionSchema'
+import { useFormStore } from './state/formStore'
 import type {
+  AcceptContractPayload,
   AdhesionFormData,
   CreateContactPayload,
-  UrlParams,
-  FormErrors,
-  AcceptContractPayload,
   FlowConfig,
+  FormErrors,
+  UrlParams,
 } from './types'
 
 const getCookiesAsString = (): string => {
