@@ -1,28 +1,36 @@
 trigger:
-- main
+  tags:
+    include:
+      - 'v*'     # publica quando tag vX.Y.Z é criada
+  branches:
+    exclude:
+      - '*'      # evita publicar em every push
 
 pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-# 1. Instala Node.js
-- task: NodeTool@0
-  inputs:
-    versionSpec: '20.x'
-  displayName: 'Instalar Node.js'
+  - task: NodeTool@0
+    inputs:
+      checkLatest: true
+      versionSpec: '20.x'
 
-# 2. Instala dependências
-- script: npm ci
-  displayName: 'Instalar dependências'
+  # Autentica no feed usando o .npmrc do repo
+  - task: npmAuthenticate@0
+    displayName: 'Authenticate to Azure Artifacts feed'
+    inputs:
+      workingFile: .npmrc
 
-# 3. Build da lib usando tsconfig.build.json
-- script: npm run build
-  displayName: 'Build da lib'
+  - script: npm ci
+    displayName: Install
 
-# 4. Autentica no feed e publica
-- script: |
-    echo "//bulbe.visualstudio.com/Site%20Bulbe/_packaging/bulbe-form-kit/npm/registry/:_authToken=$(System.AccessToken)" > .npmrc
-    npm run publish:azure
-  displayName: 'Publicar no Azure Artifacts'
-  env:
-    NPM_TOKEN: $(System.AccessToken)
+  - script: npm run build
+    displayName: Build
+
+  # opcional: validação rápida
+  - script: npm run typecheck && npm run lint
+    displayName: Checks
+    continueOnError: true
+
+  - script: npm publish
+    displayName: Publish

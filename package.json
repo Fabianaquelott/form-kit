@@ -2,26 +2,25 @@
   "name": "@bulbe/adhesion-form-lib",
   "version": "1.0.0",
   "description": "Biblioteca de componentes e lógica para formulários de adesão",
-  "private": true,
   "type": "module",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "require": "./dist/index.cjs"
     },
     "./core": {
       "types": "./dist/core/index.d.ts",
       "import": "./dist/core/index.mjs",
-      "require": "./dist/core/index.js"
+      "require": "./dist/core/index.cjs"
     },
     "./ui": {
       "types": "./dist/ui/index.d.ts",
       "import": "./dist/ui/index.mjs",
-      "require": "./dist/ui/index.js"
+      "require": "./dist/ui/index.cjs"
     }
   },
   "files": [
@@ -30,6 +29,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsup",
+    "prepublishOnly": "npm run build",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "lint": "eslint .",
@@ -37,6 +37,9 @@
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview"
+  },
+  "publishConfig": {
+    "registry": "https://bulbe.pkgs.visualstudio.com/3c1944e0-8fb5-4aff-b736-e4e2b144c64f/_packaging/bulbe-form-kit/npm/registry/"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
