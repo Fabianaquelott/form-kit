@@ -3,7 +3,6 @@ import CameraIcon from '../../../assets/camera-icon.svg';
 import TrashIcon from '../../../assets/trash-icon.svg';
 import PaperIcon from '../../../assets/paper-icon.svg';
 import { Label } from '../Label/Label';
-import styles from './FileInput.module.css';
 
 interface FileButtonInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -68,24 +67,24 @@ export const FileButtonInput = forwardRef<FileButtonInputRef, FileButtonInputPro
     };
 
     return (
-      <div className={`${styles.container} ${fullWidth ? styles.fullWidth : ''}`}>
+      <div className={`file-input-container ${fullWidth ? 'file-input-container--full-width' : ''}`}>
         {label && <Label htmlFor={inputId}>{label}</Label>}
 
         {!fileName ? (
-          <label htmlFor={inputId} className={styles.button}>
+          <label htmlFor={inputId} className="file-input__button">
             {buttonText}
-            <span className={styles.iconCamera}>
-              <img src={CameraIcon} alt='Ícone de câmera' className={styles.icon} />
+            <span className="file-input__icon-camera">
+              <img src={CameraIcon} alt='Ícone de câmera' />
             </span>
           </label>
         ) : (
-          <div className={styles.fileInfo}>
-            <div className={styles.fileNameContainer}>
+          <div className="file-input__file-info">
+            <div className="file-input__file-name-container">
               <span><img src={PaperIcon} /></span>
-              <span className={styles.fileName}>{fileName}</span>
+              <span className="file-input__file-name">{fileName}</span>
             </div>
-            <button type="button" className={styles.clearButton} onClick={handleClear}>
-              <span className={styles.iconTrash}><img src={TrashIcon} /></span>
+            <button type="button" className="file-input__clear-button" onClick={handleClear}>
+              <span className="file-input__icon-trash"><img src={TrashIcon} /></span>
             </button>
           </div>
         )}
@@ -96,12 +95,12 @@ export const FileButtonInput = forwardRef<FileButtonInputRef, FileButtonInputPro
           ref={inputRef}
           accept=".svg,.png,.jpeg,.jpg,.pdf,.webp"
           {...props}
-          className={styles.hiddenInput}
+          className="file-input__hidden"
           onChange={handleChange}
         />
 
         {(internalError || errorMessage) && (
-          <div className={styles.errorMessage}>{internalError || errorMessage}</div>
+          <div className="file-input__error-message">{internalError || errorMessage}</div>
         )}
       </div>
     );

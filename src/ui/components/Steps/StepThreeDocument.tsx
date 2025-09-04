@@ -4,7 +4,6 @@ import { Button } from '../Button/Button';
 import { FileButtonInput, FileButtonInputRef } from '../Input/FileInput';
 import { Input } from '../Input/Input';
 import { Toggle } from '../Toggle/Toggle';
-import styles from './StepThreeDocument.module.css';
 
 interface StepThreeDocumentProps {
   documentType: 'cpf' | 'cnpj' | 'both';
@@ -48,16 +47,16 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
   };
 
   return (
-    <div className={styles.stepContainer}>
-      <div className={styles.stepHeader}>
-        <h2 className={styles.stepTitle}>Preencha os dados da conta de luz.</h2>
-        <p className={styles.stepDescription}>Em caso de dúvidas, clique aqui.</p>
+    <div className="step-three-container">
+      <div className="step-header">
+        <h2 className="step-title">Preencha os dados da conta de luz.</h2>
+        <p className="step-description">Em caso de dúvidas, clique aqui.</p>
       </div>
-      <div className={styles.radioGroup}>
+      <div className="step-radio-group">
         {documentType === 'both' && (
           <div style={{ marginBottom: '32px' }}>
-            <p className={styles.stepQuestion}>Onde quer economizar? <span className={styles.start}>*</span></p>
-            <div className={styles.radioOption}>
+            <p className="step-question">Onde quer economizar? <span className="step-three-start">*</span></p>
+            <div className="step-radio-option">
               <Button aria-label="Botão para selecionar casa" type="button" variant={selectedDocumentType === 'cpf' ? 'primary' : 'outline'} onClick={() => handleSelectType('cpf')} >Casa</Button>
               <Button aria-label="Botão para selecionar empresa"
                 type="button" variant={selectedDocumentType === 'cnpj' ? 'primary' : 'outline'} onClick={() => handleSelectType('cnpj')} >Empresa</Button>
@@ -66,22 +65,22 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
         )}
         {selectedDocumentType !== 'cnpj' && (
           <>
-            <p className={styles.stepQuestion}>A conta de luz está em seu nome? <span className={styles.start}>*</span></p>
-            <div className={styles.radioOption}>
+            <p className="step-three-question">A conta de luz está em seu nome? <span className="step-three-start">*</span></p>
+            <div className="step-radio-option">
               <Button aria-label="Botão sim para caso a conta de luz estiver no nome do cadastrante" type="button" variant={isBillOwner === true ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(true)}>Sim</Button>
               <Button aria-label="Botão não para caso a conta de luz não esteja no nome do cadastrante" type="button" variant={isBillOwner === false ? 'primary' : 'outline'} onClick={() => handleBillOwnerChange(false)}>Não</Button>
             </div>
-            {errors.isBillOwner && <p className={styles.errorMessage}>{errors.isBillOwner.message as string}</p>}
+            {errors.isBillOwner && <p className="step-error-message">{errors.isBillOwner.message as string}</p>}
           </>
         )}
 
       </div>
-      <div className={styles.stepContent}>
+      <div className="step-content">
         {selectedDocumentType === 'cpf' && (
           <>
             {dontKnowBillOwnerCpf === false && isBillOwner === true &&
 
-              <div className={styles.inputMyCpfContainer}>
+              <div className="step-three-input-my-cpf-container">
                 <Input aria-label="Inserir cpf do cadastrante" {...register('myCpf')} label="Meu CPF *" placeholder="000.000.000-00" errorMessage={errors.myCpf?.message as string} fullWidth />
               </div>
             }
@@ -89,9 +88,9 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
             {isBillOwner === false && (
               <>
                 {dontKnowBillOwnerCpf ? (
-                  <div className={styles.inputFileContainer}>
-                    <p className={styles.titleFileInput}>Conta de luz atual <span className={styles.start}>*</span></p>
-                    {billFile && billFile.length > 0 && <hr className={styles.lineFileInput} />}
+                  <div className="step-three-input-file-container">
+                    <p className="step-three-title-file-input">Conta de luz atual <span className="step-three-start">*</span></p>
+                    {billFile && billFile.length > 0 && <hr className="step-three-line-file-input" />}
                     <FileButtonInput
                       {...register('billFile')}
                       aria-label="Botão para enviar conta de luz"
@@ -106,11 +105,11 @@ const StepThreeDocument: React.FC<StepThreeDocumentProps> = ({ documentType }) =
                     />
                   </div>
                 ) : (
-                  <div className={styles.containerInputOwnerCpf}>
+                  <div className="step-three-container-input-owner-cpf">
                     <Input aria-label="Inserir cpf do titular da conta" {...register('billOwnerCpf')} label="CPF do titular da conta de luz" placeholder="000.000.000-00" errorMessage={errors.billOwnerCpf?.message as string} fullWidth />
                   </div>
                 )}
-                <div className={styles.toggleContainer}>
+                <div className="step-three-toggle-container">
                   <Toggle
                     aria-label="Alternar para não sei o cpf do titular da conta"
                     id="dontKnowCpf"

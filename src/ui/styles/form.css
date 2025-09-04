@@ -1,7 +1,7 @@
-/* src/ui/DefaultAdhesionForm.module.css */
+/* === FORM STYLES === */
 
-/* --- Contêiner e Card Principal --- */
-.container {
+/* Contêiner e Card Principal */
+.form-container {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -11,7 +11,7 @@
   font-family: var(--font-sans);
 }
 
-.formCard {
+.form-card {
   width: 100%;
   max-width: 40rem;
   background-color: var(--color-white);
@@ -20,11 +20,12 @@
   padding: var(--space-8);
 }
 
-/* --- Barra de Progresso --- */
-.progress {
+/* Barra de Progresso */
+.form-progress {
   margin-bottom: var(--space-8);
 }
-.progressBar {
+
+.form-progress-bar {
   width: 100%;
   height: 0.5rem;
   background-color: var(--color-gray-200);
@@ -32,13 +33,15 @@
   overflow: hidden;
   margin-bottom: var(--space-2);
 }
-.progressFill {
+
+.form-progress-fill {
   height: 100%;
   background-color: var(--color-primary-600);
   border-radius: var(--radius-full);
   transition: width var(--transition-normal);
 }
-.progressText {
+
+.form-progress-text {
   display: block;
   text-align: center;
   font-size: var(--text-sm);
@@ -46,25 +49,25 @@
   font-weight: var(--font-medium);
 }
 
-/* --- Estrutura e Layout --- */
+/* Estrutura e Layout */
 .form {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
 }
 
-.stepContainer {
+.form-step-container {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
   animation: fadeIn 0.5s ease-in-out;
 }
 
-.stepHeader {
+.form-step-header {
   text-align: center;
 }
 
-.stepTitle {
+.form-step-title {
   font-size: var(--text-2xl);
   font-weight: var(--font-bold);
   color: var(--color-gray-900);
@@ -72,49 +75,49 @@
   line-height: var(--leading-tight);
 }
 
-.stepDescription {
+.form-step-description {
   font-size: var(--text-base);
   color: var(--color-gray-600);
   line-height: var(--leading-normal);
   margin: 0;
 }
 
-.stepContent {
+.form-step-content {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
-/* --- Elementos Comuns --- */
-.checkboxContainer {
+/* Elementos Comuns */
+.form-checkbox-container {
   display: flex;
   align-items: center;
   gap: var(--space-2);
 }
 
-.warningBox {
+.form-warning-box {
   padding: var(--space-3);
   background-color: var(--color-warning-50);
   border: 1px solid var(--color-warning-200);
   border-radius: var(--radius-md);
 }
 
-.link {
+.form-link {
   color: var(--color-primary-600);
   text-decoration: underline;
   font-weight: var(--font-medium);
 }
 
-.link:hover {
+.form-link:hover {
   color: var(--color-primary-700);
 }
 
-.errorMessage {
+.form-error-message {
   font-size: var(--text-xs);
   color: var(--color-error-600);
 }
 
-.generalError {
+.form-general-error {
   padding: var(--space-3);
   background-color: var(--color-error-50);
   border: 1px solid var(--color-error-200);
@@ -124,18 +127,18 @@
   font-weight: var(--font-medium);
 }
 
-.navigation {
+.form-navigation {
   display: flex;
   gap: var(--space-3);
   justify-content: space-between;
   margin-top: var(--space-4);
 }
 
-.navigation:has(:only-child) {
+.form-navigation:has(:only-child) {
   justify-content: flex-end;
 }
 
-/* --- Animações --- */
+/* Animações */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -147,21 +150,21 @@
   }
 }
 
-/* --- Responsividade --- */
+/* Responsividade */
 @media (max-width: 640px) {
-  .container {
+  .form-container {
     padding: var(--space-2);
   }
-  .formCard {
+  .form-card {
     padding: var(--space-6);
   }
-  .stepTitle {
+  .form-step-title {
     font-size: var(--text-xl);
   }
-  .navigation {
+  .form-navigation {
     flex-direction: column-reverse;
   }
-  .navigation:has(:only-child) {
+  .form-navigation:has(:only-child) {
     flex-direction: column;
   }
 }

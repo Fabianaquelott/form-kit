@@ -15,10 +15,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     css: {
-      modules: {
-        localsConvention: 'camelCase',
-        generateScopedName: '[name]__[local]___[hash:base64:5]',
-      },
+      // CSS modules removido - usando CSS puro agora
     },
     server: {
       port: 3000,

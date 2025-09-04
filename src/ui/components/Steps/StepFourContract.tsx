@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import CustomScrollbar from '../ScrollBar/CustomScrollbar';
-import styles from './StepFour.module.css';
 
 const StepFourContract: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -14,19 +13,19 @@ const StepFourContract: React.FC = () => {
 
 
   return (
-    <div className={styles.stepContainer}>
-      <div className={styles.stepHeader}>
-        <h2 className={styles.stepTitle}>Leia o termo de adesão para contratar.</h2>
-        <p className={styles.stepDescription}>
+    <div className="step-four-container">
+      <div className="step-header">
+        <h2 className="step-title">Leia o termo de adesão para contratar.</h2>
+        <p className="step-description">
           Concorde com o Termo de Adesão para contratar e começar a economizar.
         </p>
       </div>
       <div style={{ borderTop: '1px solid #C2CCD6', marginTop: '40px' }}></div>
       <div>
-        <h2 className={styles.adhesionTitle}>Termo de adesão</h2>
-        <p className={styles.adhesionSubtitle}>Última atualização em 22/01/2025</p>
+        <h2 className="step-four-adhesion-title">Termo de adesão</h2>
+        <p className="step-four-adhesion-subtitle">Última atualização em 22/01/2025</p>
       </div>
-      <div className={styles.container}>
+      <div className="step-four-container-terms">
         <CustomScrollbar arial-labels="Barra de rolagem" height={220} thickness={8} thumbMinSize={120}>
           <div id="termsContract" ref={scrollRef}>
             <p>

@@ -1,7 +1,6 @@
 // src/ui/components/Steps/Step5_Complete.tsx
 
 import React from 'react';
-import styles from './Steps.module.css';
 import { Button } from '../Button/Button';
 
 interface StepFiveCompleteProps {
@@ -17,18 +16,18 @@ const StepFiveComplete: React.FC<StepFiveCompleteProps> = ({ referralCoupon }) =
   };
 
   return (
-    <div className={styles.stepContainer}>
-      <div className={styles.stepHeader}>
-        <h2 className={styles.stepTitle}>Economia contratada com sucesso!</h2>
-        <p className={styles.stepDescription}>
+    <div className="step-container">
+      <div className="step-header">
+        <h2 className="step-title">Economia contratada com sucesso!</h2>
+        <p className="step-description">
           Vamos mantê-lo informado pelo nosso aplicativo, e-mail e WhatsApp.
         </p>
       </div>
       {referralCoupon && (
-        <div className={styles.referralBox}>
+        <div className="step-referral-box">
           <h3>Indique e Ganhe!</h3>
           <p>Compartilhe seu cupom exclusivo e ganhe R$50 no PIX a cada adesão válida.</p>
-          <div className={styles.couponCode}>{referralCoupon}</div>
+          <div className="step-coupon-code">{referralCoupon}</div>
           <Button onClick={handleShare} fullWidth>
             Compartilhar no WhatsApp
           </Button>

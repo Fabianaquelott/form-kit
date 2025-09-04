@@ -2,7 +2,6 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Input } from '../Input/Input';
 import { Button } from '../Button/Button';
-import styles from './StepTwoSmsValidation.module.css';
 
 interface StepTwoSmsValidationProps {
   handleResendSms: () => void;
@@ -20,17 +19,17 @@ const StepTwoSmsValidation: React.FC<StepTwoSmsValidationProps> = ({
   const { register, formState: { errors } } = useFormContext();
 
   return (
-    <div className={styles.stepContainer}>
-      <div className={styles.stepHeader}>
-        <h2 className={styles.stepTitle}>Valide seu formato de contato.</h2>
-        <p className={styles.stepDescription}>
+    <div className="step-container">
+      <div className="step-header">
+        <h2 className="step-title">Valide seu formato de contato.</h2>
+        <p className="step-description">
           Digite o código enviado por SMS para o número:
         </p>
-        <p className={styles.stepPhoneNumber}>
+        <p className="step-phone-number">
           {phoneNumber}
         </p>
       </div>
-      <div className={styles.stepContent}>
+      <div className="step-two-content">
         <Input
           {...register('smsCode')}
           label="Código de ativação"

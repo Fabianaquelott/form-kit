@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import styles from "./CustomScrollBar.module.css";
 
 type Props = {
   children: React.ReactNode;
@@ -153,7 +152,7 @@ export const CustomScrollbar: React.FC<Props> = ({
 
   return (
     <div
-      className={`${styles.wrapper} ${className || ""}`}
+      className={`custom-scrollbar-wrapper ${className || ""}`}
       style={
         {
           "--csb-height": typeof height === "number" ? `${height}px` : height,
@@ -163,19 +162,19 @@ export const CustomScrollbar: React.FC<Props> = ({
     >
       <div
         ref={viewportRef}
-        className={styles.viewport}
+        className="custom-scrollbar-viewport"
       >
         {children}
       </div>
 
       <div
         ref={trackRef}
-        className={styles.track}
+        className="custom-scrollbar-track"
         onMouseDown={handleTrackMouseDown}
         aria-hidden
       >
         <div
-          className={styles.thumb}
+          className="custom-scrollbar-thumb"
           data-role="thumb"
           style={{ height: `${thumbSize}px`, transform: `translateY(${thumbTop}px)` }}
           onMouseDown={handleThumbMouseDown}

@@ -1,0 +1,5 @@
+/* Import all component styles */
+@import './theme.css';
+@import './components.css';
+@import './steps.css';
+@import './form.css';

@@ -1,0 +1,612 @@
+/* === STEP COMPONENTS === */
+
+/* Base Step Styles */
+.step-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.step-header {
+  margin-top: 32px;
+  text-align: center;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+}
+
+.step-title {
+  color: #08068D;
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 30px;
+  text-align: justify;
+}
+
+.step-title--bold {
+  color: var(--Primary-Azul-Universo-700, #08068D);
+  font-family: Inter;
+  font-size: 54px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 72px;
+  letter-spacing: -1.08px;
+}
+
+.step-description {
+  color: var(--GrayScale-600, #536679);
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 20px;
+  text-align: justify;
+}
+
+.step-description--bold {
+  color: var(--GrayScale-600, #536679);
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 30px;
+}
+
+.step-phone-number {
+  margin-top: 10px;
+  color: #000;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  text-align: justify;
+  letter-spacing: 0.32px;
+}
+
+.step-question {
+  color: var(--GrayScale-600, #536679);
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.28px;
+  text-align: justify;
+}
+
+.step-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.step-button-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.step-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.step-radio-option {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.step-radio-group p {
+  margin: 0 0 var(--space-1) 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-gray-700);
+}
+
+.step-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.step-checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--color-primary-600);
+}
+
+.step-checkbox-label {
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+  cursor: pointer;
+}
+
+.step-link {
+  color: var(--color-primary-600);
+  text-decoration: underline;
+  font-weight: var(--font-medium);
+}
+
+.step-link:hover {
+  color: var(--color-primary-700);
+}
+
+.step-error-message {
+  font-size: var(--text-xs);
+  color: var(--color-error-600);
+}
+
+.step-warning-box {
+  padding: var(--space-3);
+  background-color: var(--color-warning-50);
+  border: 1px solid var(--color-warning-200);
+  border-radius: var(--radius-md);
+}
+
+.step-terms-box {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: var(--space-4);
+  background-color: var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.step-terms-box p {
+  margin-bottom: var(--space-3);
+}
+
+.step-terms-box p:last-child {
+  margin-bottom: 0;
+}
+
+.step-referral-box {
+  text-align: center;
+  padding: var(--space-6);
+  background: linear-gradient(135deg, var(--color-primary-50), var(--color-secondary-50));
+  border: 1px solid var(--color-primary-200);
+  border-radius: var(--radius-xl);
+}
+
+.step-referral-box h3 {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-primary-700);
+  margin-bottom: var(--space-2);
+}
+
+.step-referral-box p {
+  font-size: var(--text-sm);
+  color: var(--color-gray-600);
+  margin-bottom: var(--space-4);
+  line-height: var(--leading-relaxed);
+}
+
+.step-coupon-code {
+  display: inline-block;
+  padding: var(--space-3) var(--space-6);
+  background-color: var(--color-primary-600);
+  color: var(--color-white);
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  letter-spacing: 0.1em;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === STEP ONE PERSONAL DATA === */
+.step-one-title {
+  color: #08068D;
+  font-size: 54px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 72px;
+  letter-spacing: -1.08px;
+  text-align: justify;
+}
+
+.step-one-title--bold {
+  color: var(--Primary-Azul-Universo-700, #08068D);
+  font-size: 54px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 72px;
+  letter-spacing: -1.08px;
+}
+
+.step-one-description {
+  color: var(--GrayScale-600, #536679);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 30px;
+  text-align: justify;
+}
+
+.step-one-description--bold {
+  color: var(--GrayScale-600, #536679);
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 30px;
+}
+
+.step-one-content {
+  display: flex;
+  flex-direction: column;
+  gap: 33px;
+}
+
+.step-one-policy-text {
+  color: var(--GrayScale-600, #536679);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0.24px;
+}
+
+.step-one-policy-text--bold {
+  color: var(--GrayScale-600, #536679);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0.24px;
+}
+
+.step-one-policy-text--link {
+  color: var(--Primary-Azul-Universo-700, #08068D);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0.24px;
+  text-decoration-line: underline;
+}
+
+.step-one-block-text {
+  display: block;
+  margin-top: 2px;
+}
+
+@media(max-width: 576px) {
+  .step-container {
+    gap: 30px;
+  }
+
+  .step-one-title {
+    font-size: 36px;
+    font-weight: 300;
+    line-height: 44px;
+    letter-spacing: -0.72px;
+  }
+
+  .step-one-title--bold {
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 44px;
+    letter-spacing: -0.72px;
+  }
+
+  .step-one-description {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 22px;
+  }
+
+  .step-one-description--bold {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 22px;
+  }
+
+  .step-one-content {
+    gap: 33.5px;
+  }
+}
+
+/* === STEP TWO SMS VALIDATION === */
+.step-two-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.step-two-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* === STEP THREE DOCUMENT === */
+.step-three-container {
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.step-three-question {
+  color: var(--GrayScale-600, #536679);
+  font-family: Inter;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.28px;
+  margin-bottom: 8px;
+  text-align: justify;
+}
+
+.step-three-container-input-owner-cpf {
+  margin-top: 32px;
+}
+
+.step-three-input-file-container {
+  margin-top: 32px;
+}
+
+.step-three-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: 17px;
+}
+
+.step-three-input-my-cpf-container {
+  margin-top: 16px;
+}
+
+.step-three-title-file-input {
+  color: var(--GrayScale-600, #536679);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: 0.24px;
+  margin-bottom: 8px;
+}
+
+.step-three-line-file-input {
+  margin-top: 16px;
+  border-top: 1px solid var(--GrayScale-200, #C2CCD6);
+}
+
+.step-three-start {
+  color: #DC2626;
+}
+
+@media (max-width: 640px) {
+  .step-title {
+    color: #08068D;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 30px;
+    margin-bottom: 16px;
+    text-align: justify;
+  }
+
+  .step-three-question {
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 16px;
+    letter-spacing: 0.4px;
+    text-align: justify;
+    margin-top: 16px;
+  }
+
+  .step-button-group {
+    grid-template-columns: 1fr;
+  }
+
+  .step-referral-box {
+    padding: var(--space-4);
+  }
+
+  .step-coupon-code {
+    font-size: var(--text-base);
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .step-three-title-file-input {
+    margin-bottom: 8px;
+  }
+
+  .step-three-toggle-container {
+    margin-top: 14px;
+  }
+
+  .step-three-line-file-input {
+    margin-bottom: 0px;
+  }
+}
+
+/* === STEP FOUR CONTRACT === */
+.step-four-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.step-four-adhesion-title {
+  color: var(--Primary-Azul-Universo-700, #08068D);
+  font-family: Inter;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: 0.4px;
+}
+
+.step-four-adhesion-subtitle {
+  color: var(--GrayScale-600, #536679);
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 300;
+  line-height: 150%;
+  letter-spacing: 0.24px;
+}
+
+.step-four-container-terms {
+  position: relative;
+  width: 504px;
+  height: 250px;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  color: #536679;
+  background: white;
+  margin-top: 16px;
+  line-height: 150%;
+  letter-spacing: 0.24px;
+  font-style: normal;
+  text-align: justify;
+}
+
+.step-four-button-down {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background-color: #132e87;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.step-four-button-down:hover {
+  background-color: #0a1a4f;
+}
+
+@media (max-width: 640px) {
+  .step-four-container-terms {
+    max-width: 300px;
+  }
+
+  .step-title {
+    font-size: 18px;
+    letter-spacing: 0.3px;
+    max-width: 300px;
+    margin-bottom: 16px;
+  }
+
+  .step-description {
+    max-width: 300px;
+  }
+}
+
+/* === STEP FIVE COMPLETE === */
+.step-five-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.step-five-editor-header {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.step-five-content-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.step-five-sortable-item {
+  cursor: grab;
+  user-select: none;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.step-five-sortable-item:active {
+  cursor: grabbing;
+}
+
+.step-five-dragging {
+  opacity: 0.8;
+  transform: scale(1.02);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.step-five-editor-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.step-five-editor-section input,
+.step-five-editor-section textarea,
+.step-five-editor-section select {
+  padding: 4px 6px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.step-five-editor-section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.step-five-coupon-code {
+  font-size: 18px;
+  font-weight: bold;
+  background: #fff;
+  border: 1px dashed #aaa;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.step-five-drag-handle {
+  cursor: grab;
+  padding: 4px;
+  user-select: none;
+  margin-bottom: 8px;
+}
+
+.step-five-drag-handle:active {
+  cursor: grabbing;
+}
+
+.step-five-item-content {
+  flex: 1;
+}

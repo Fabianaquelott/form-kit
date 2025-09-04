@@ -1,25 +1,23 @@
 import React, { forwardRef } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import styles from './Button.module.css'
-
-const buttonVariants = cva(styles.button, {
+const buttonVariants = cva('button', {
   variants: {
     variant: {
-      primary: styles.primary,
-      secondary: styles.secondary,
-      outline: styles.outline,
-      ghost: styles.ghost,
-      danger: styles.danger,
-      linkMuted: styles.linkMuted,
+      primary: 'button--primary',
+      secondary: 'button--secondary',
+      outline: 'button--outline',
+      ghost: 'button--ghost',
+      danger: 'button--danger',
+      linkMuted: 'button--link-muted',
     },
     size: {
-      sm: styles.sm,
-      md: styles.md,
-      lg: styles.lg,
+      sm: 'button--sm',
+      md: 'button--md',
+      lg: 'button--lg',
     },
     fullWidth: {
-      true: styles.fullWidth,
+      true: 'button--full-width',
     },
   },
   defaultVariants: {
@@ -63,23 +61,23 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isLoading && (
-          <div className={styles.spinner} aria-hidden="true">
-            <div className={styles.spinnerIcon} />
+          <div className="button__spinner" aria-hidden="true">
+            <div className="button__spinner-icon" />
           </div>
         )}
 
         {!isLoading && leftIcon && (
-          <span className={styles.leftIcon} aria-hidden="true">
+          <span className="button__left-icon" aria-hidden="true">
             {leftIcon}
           </span>
         )}
 
-        <span className={isLoading ? styles.loadingText : ''}>
+        <span className={isLoading ? 'button__loading-text' : ''}>
           {children}
         </span>
 
         {!isLoading && rightIcon && (
-          <span className={styles.rightIcon} aria-hidden="true">
+          <span className="button__right-icon" aria-hidden="true">
             {rightIcon}
           </span>
         )}

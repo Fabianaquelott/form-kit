@@ -1,19 +1,18 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import React, { forwardRef } from 'react';
 import InputMask from 'react-input-mask';
-import styles from './Input.module.css';
 
-const inputVariants = cva(styles.input, {
+const inputVariants = cva('input', {
   variants: {
     size: {
-      sm: styles.sm,
-      md: styles.md,
-      lg: styles.lg,
+      sm: 'input--sm',
+      md: 'input--md',
+      lg: 'input--lg',
     },
     state: {
       default: '',
-      error: styles.error,
-      success: styles.success,
+      error: 'input--error',
+      success: 'input--success',
     },
   },
   defaultVariants: {
@@ -127,25 +126,25 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     return (
-      <div className={`${styles.container} ${fullWidth ? styles.fullWidth : ''}`}>
+      <div className={`input-container ${fullWidth ? 'input-container--full-width' : ''}`}>
         {label && (
-          <label htmlFor={inputId} className={styles.label}>
+          <label htmlFor={inputId} className="input-label">
             {label}
-            {props.required && <span className={styles.required}>*</span>}
+            {props.required && <span className="input-required">*</span>}
           </label>
         )}
-        <div className={styles.inputWrapper}>
-          {leftIcon && <div className={styles.leftIcon}>{leftIcon}</div>}
+        <div className="input-wrapper">
+          {leftIcon && <div className="input__left-icon">{leftIcon}</div>}
           {renderInput()}
-          {rightIcon && <div className={styles.rightIcon}>{rightIcon}</div>}
+          {rightIcon && <div className="input__right-icon">{rightIcon}</div>}
         </div>
         {hasError && (
-          <div id={`${inputId}-error`} className={styles.errorMessage} role="alert">
+          <div id={`${inputId}-error`} className="input__error-message" role="alert">
             {errorMessage}
           </div>
         )}
         {!hasError && helperText && (
-          <div id={`${inputId}-helper`} className={styles.helperText}>
+          <div id={`${inputId}-helper`} className="input__helper-text">
             {helperText}
           </div>
         )}

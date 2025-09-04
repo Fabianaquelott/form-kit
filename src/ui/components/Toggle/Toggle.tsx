@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './Toggle.module.css';
 
 interface ToggleProps {
   checked: boolean;
@@ -21,20 +20,20 @@ export const Toggle: React.FC<ToggleProps> = ({
   offColor = '#ccc',
 }) => {
   return (
-    <div className={`${styles.toggleContainer} ${labelPosition === 'left' ? styles.leftLabel : ''}`}>
-      {label && labelPosition === 'left' && <label htmlFor={id} className={styles.label}>{label}</label>}
+    <div className={`toggle-container ${labelPosition === 'left' ? 'toggle-container--left-label' : ''}`}>
+      {label && labelPosition === 'left' && <label htmlFor={id} className="toggle-label">{label}</label>}
       <button
         id={id}
         type="button"
         role="switch"
         aria-checked={checked}
-        className={styles.toggle}
+        className="toggle"
         onClick={() => onChange(!checked)}
         style={{ backgroundColor: checked ? onColor : offColor }}
       >
-        <span className={styles.thumb} />
+        <span className="toggle__thumb" />
       </button>
-      {label && labelPosition === 'right' && <label htmlFor={id} className={styles.label}>{label}</label>}
+      {label && labelPosition === 'right' && <label htmlFor={id} className="toggle-label">{label}</label>}
     </div>
   );
 };

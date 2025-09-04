@@ -1,28 +1,26 @@
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
-import formStyles from '../../DefaultAdhesionForm.module.css';
 import { Input } from '../Input/Input';
 import { Label } from '../Label/Label';
-import styles from './StepOnePersonalData.module.css';
 
 const StepOnePersonalData: React.FC = () => {
   const { register, watch, formState: { errors } } = useFormContext();
   const isEmailConfirmationRequired = watch('isEmailConfirmationRequired');
 
   return (
-    <div className={styles.stepContainer}>
-      <div className={styles.stepHeader}>
-        <h1 className={styles.stepTitle}>
+    <div className="step-container">
+      <div className="step-header">
+        <h1 className="step-one-title">
           Sua conta de luz<br />
-          <span className={styles.stepTitleBold}>mais leve.</span>
+          <span className="step-one-title--bold">mais leve.</span>
         </h1>
-        <p className={styles.stepDescription}>
+        <p className="step-one-description">
           Junte-se a mais de 50 mil famílias e garanta até 15% de desconto no consumo de sua conta de luz{' '}
-          <span className={styles.stepDescriptionBold}>de forma simples e digital.</span>
+          <span className="step-one-description--bold">de forma simples e digital.</span>
         </p>
       </div>
 
-      <div className={styles.stepContent}>
+      <div className="step-one-content">
         <Input
           {...register('name')}
           label="Nome completo"
@@ -57,19 +55,19 @@ const StepOnePersonalData: React.FC = () => {
         />
 
         {isEmailConfirmationRequired && (
-          <div className={`${formStyles.checkboxContainer} ${formStyles.warningBox}`}>
+          <div className="form-checkbox-container form-warning-box">
             <input
               {...register('emailConfirmed')}
               type="checkbox"
               id="emailConfirmed"
-              className={formStyles.checkbox}
+              className="step-checkbox"
               aria-label='Confirmação de e-mail'
             />
-            <Label htmlFor="emailConfirmed" className={formStyles.checkboxLabel}>
+            <Label htmlFor="emailConfirmed" className="step-checkbox-label">
               Meu e-mail está correto.
             </Label>
             {errors.emailConfirmed && (
-              <div className={formStyles.errorMessage}>
+              <div className="form-error-message">
                 {errors.emailConfirmed.message as string}
               </div>
             )}
@@ -77,12 +75,12 @@ const StepOnePersonalData: React.FC = () => {
         )}
 
         <div aria-label='Política de Privacidade'>
-          <p className={styles.policyText}>
+          <p className="step-one-policy-text">
             Ao submeter minhas respostas e clicar{' '}
-            <span className={styles.policyTextBold}>“Quero economizar”, </span>
+            <span className="step-one-policy-text--bold">"Quero economizar", </span>
             concordo com a{' '}
-            <span className={styles.blockText}>
-              <a href="/politica-de-privacidade" className={styles.policyTextLink}>
+            <span className="step-one-block-text">
+              <a href="/politica-de-privacidade" className="step-one-policy-text--link">
                 Política de Privacidade
               </a>{' '}
               da Bulbe energia.

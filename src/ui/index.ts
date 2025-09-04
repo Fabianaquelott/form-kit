@@ -1,5 +1,8 @@
 // src/ui/index.ts
 
+// Import styles
+import './styles/index.css'
+
 export { Button } from './components/Button/Button'
 export type { ButtonProps } from './components/Button/Button'
 

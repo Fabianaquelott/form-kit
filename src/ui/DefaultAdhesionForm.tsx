@@ -8,7 +8,6 @@ import StepFourContract from './components/Steps/StepFourContract'
 import StepOnePersonalData from './components/Steps/StepOnePersonalData'
 import StepThreeDocument from './components/Steps/StepThreeDocument'
 import StepTwoSmsValidation from './components/Steps/StepTwoSmsValidation'
-import styles from './DefaultAdhesionForm.module.css'
 
 export interface DefaultAdhesionFormProps {
   flowConfig?: FlowConfig;
@@ -65,14 +64,14 @@ export const DefaultAdhesionForm: React.FC<DefaultAdhesionFormProps> = ({
   };
 
   return (
-    <div className={`${styles.container} ${className || ''}`}>
-      <div className={styles.formCard}>
+    <div className={`form-container ${className || ''}`}>
+      <div className="form-card">
         <StepIndicator currentStep={navigation.currentStepIndex} totalSteps={navigation.totalSteps} />
         <FormProvider {...formMethods.form}>
-          <form onSubmit={onSubmit} className={styles.form}>
+          <form onSubmit={onSubmit} className="form">
             {renderCurrentStep()}
             {errors.general && currentStep !== 2 && (
-              <div className={styles.generalError} role="alert">
+              <div className="form-general-error" role="alert">
                 {errors.general}
               </div>
             )}
